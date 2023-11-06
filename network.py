@@ -20,7 +20,7 @@ class NN_2_parameters(nn.Module):
     
     def __init__(self):
         super(NN_2_parameters, self).__init__()
-        self.fc1 = nn.Linear(2, 1)
+        self.fc1 = nn.Linear(2, 1, bias=False)
 
     def forward(self, x):
         x = self.fc1(x)

@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def init_weights(weight=0.01, bias=0.01):
@@ -14,3 +16,24 @@ def euclidean_distance(model1, model2):
     params1 = torch.cat([p.view(-1) for p in model1.parameters()])
     params2 = torch.cat([p.view(-1) for p in model2.parameters()])
     return torch.norm(params1 - params2).item()
+
+
+def heatmap_2d(x_range, y_range, function, x_label="Parameter 1", y_label="Parameter 2", title="Loss Landscape of Neural Network", colorbar_label="Loss", cmap='viridis', figsize=(8, 6)):
+
+    # Define the range of parameter values
+    x_range = np.linspace(x_range[0], x_range[1], 400)
+    y_range = np.linspace(y_range[0], y_range[1], 400)
+
+    # Create a meshgrid of parameter values
+    X, Y = np.meshgrid(x_range, y_range)
+
+    # Calculate the loss for each combination of parameters
+    Z = np.vectorize(function)(X, Y)
+
+    plt.figure(figsize=figsize)
+    plt.pcolormesh(X, Y, Z, cmap=cmap)
+    plt.colorbar(label=colorbar_label)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.show()
