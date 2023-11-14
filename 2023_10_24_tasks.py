@@ -9,7 +9,7 @@ import numpy as np
 
 
 # Generate data (sphere model)
-f_1_d_2_generator = data_generator(suite_name="bbob", function=1, dimension=2, instance=1)
+f_1_d_2_generator = data_generator(suite_name="bbob", function=5, dimension=2, instance=1)
 data_x, data_y = f_1_d_2_generator.generate(data_size=200)
 
 
@@ -27,7 +27,7 @@ def loss(x, y):
     criterion = nn.MSELoss()
     return criterion(data_y, predicted_y).detach().numpy()
 
-# heatmap_2d(x_range=[-200, 200], y_range=[-200, 200], function=loss)
+heatmap_2d(x_range=[-20, 20], y_range=[-20, 20], function=loss)
 
 
 # sgd optimization
