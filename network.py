@@ -16,6 +16,24 @@ class FNN(nn.Module):
         return x
 
 
+class hidden2_FNN(nn.Module):
+    
+    def __init__(self, input_size, hidden_size_1, hidden_size_2, output_size):
+        super(hidden2_FNN, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size_1)  # First hidden layer
+        self.fc2 = nn.Linear(hidden_size_1, hidden_size_2)  # Second hidden layer
+        self.fc3 = nn.Linear(hidden_size_2, output_size)  # Output
+        self.relu = nn.ReLU()  # ReLU activation function
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.relu(x)
+        x = self.fc3(x)
+        return x
+    
+
 class NN_2_parameters(nn.Module):
     
     def __init__(self):
