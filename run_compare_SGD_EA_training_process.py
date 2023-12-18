@@ -10,7 +10,7 @@ import numpy as np
     
 # data generation
 f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
-data_x, data_y = f_3_d_2_generator.generate(data_size=1000)
+data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
 
 # build the input mesh grid for plotting
