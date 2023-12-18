@@ -42,21 +42,55 @@ num_parameters = sum(p.numel() for p in model_NN.parameters())
 param_values = generate_random_arrays(num_parameters, num_samples, [-100, 100])
 loss_values = np.array([train_neural_network(model_NN, sample_values, data_x, data_y) for sample_values in param_values])
 
-# Use PCA for dimensionality reduction to 2D
-pca = PCA(n_components=2)
+# # Use PCA for dimensionality reduction to 2D
+# pca = PCA(n_components=2)
+# param_values_pca = pca.fit_transform(param_values)
+
+# # Create a scatter plot
+# plt.figure(figsize=(10, 8))
+# scatter = plt.scatter(param_values_pca[:, 0], param_values_pca[:, 1], c=loss_values, cmap='viridis', s=50, alpha=0.7)
+
+# # Customize the plot
+# plt.title('PCA Visualization of Neural Network Parameter Space')
+# plt.xlabel('PCA Component 1')
+# plt.ylabel('PCA Component 2')
+
+# # Add colorbar
+# cbar = plt.colorbar(scatter, label='Loss')
+
+# # Calculate pairwise distances in the high-dimensional space
+# distance_matrix_solutions = pdist(param_values, metric='euclidean')
+# distance_matrix_solutions = squareform(distance_matrix_solutions)
+
+# # Calculate pairwise distances in the reduced-dimensional space
+# distance_matrix_pca = pdist(param_values_pca, metric='euclidean')
+# distance_matrix_pca = squareform(distance_matrix_pca)
+
+# # Calculate the Spearman correlation coefficient between distances in the two spaces
+# correlation_coefficient, _ = spearmanr(distance_matrix_solutions.flatten(), distance_matrix_pca.flatten())
+# print(f"Spearman Correlation Coefficient: {correlation_coefficient}")
+
+# # Show the plot
+# plt.show()
+
+
+# Perform PCA for dimensionality reduction to 3D
+pca = PCA(n_components=3)
 param_values_pca = pca.fit_transform(param_values)
 
-# Create a scatter plot
-plt.figure(figsize=(10, 8))
-scatter = plt.scatter(param_values_pca[:, 0], param_values_pca[:, 1], c=loss_values, cmap='viridis', s=50, alpha=0.7)
+# Create a 3D scatter plot
+fig = plt.figure(figsize=(12, 10))
+ax = fig.add_subplot(111, projection='3d')
+sc = ax.scatter(param_values_pca[:, 0], param_values_pca[:, 1], param_values_pca[:, 2], c=loss_values, cmap='viridis', s=30)
 
 # Customize the plot
-plt.title('PCA Visualization of Neural Network Parameter Space')
-plt.xlabel('PCA Component 1')
-plt.ylabel('PCA Component 2')
+ax.set_xlabel('Principal Component 1')
+ax.set_ylabel('Principal Component 2')
+ax.set_zlabel('Principal Component 3')
+ax.set_title('Neural Network Parameter Space')
 
 # Add colorbar
-cbar = plt.colorbar(scatter, label='Loss')
+cbar = fig.colorbar(sc, ax=ax, label='Loss')
 
 # Calculate pairwise distances in the high-dimensional space
 distance_matrix_solutions = pdist(param_values, metric='euclidean')
@@ -72,25 +106,3 @@ print(f"Spearman Correlation Coefficient: {correlation_coefficient}")
 
 # Show the plot
 plt.show()
-
-
-# # Perform PCA for dimensionality reduction to 3D
-# pca = PCA(n_components=3)
-# param_values_pca = pca.fit_transform(param_values)
-
-# # Create a 3D scatter plot
-# fig = plt.figure(figsize=(12, 10))
-# ax = fig.add_subplot(111, projection='3d')
-# sc = ax.scatter(param_values_pca[:, 0], param_values_pca[:, 1], param_values_pca[:, 2], c=loss_values, cmap='viridis', s=30)
-
-# # Customize the plot
-# ax.set_xlabel('Principal Component 1')
-# ax.set_ylabel('Principal Component 2')
-# ax.set_zlabel('Principal Component 3')
-# ax.set_title('Neural Network Parameter Space')
-
-# # Add colorbar
-# cbar = fig.colorbar(sc, ax=ax, label='Loss')
-
-# # Show the plot
-# plt.show()
