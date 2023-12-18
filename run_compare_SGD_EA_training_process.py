@@ -8,17 +8,46 @@ import torch.optim as optim
 import numpy as np
 
     
-# generate data
-f_3_d_3_generator = data_generator(suite_name="bbob", function=3, dimension=3, instance=1)
-data_x, data_y = f_3_d_3_generator.generate(data_size=1000)
+# data generation
+f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
+data_x, data_y = f_3_d_2_generator.generate(data_size=1000)
 
 
-# SGD optimization
-sgd_network = hidden2_FNN(3, 50, 20, 1)
+# build the input mesh grid for plotting
+x1_values = np.linspace(-5, 5, 100)
+x2_values = np.linspace(-5, 5, 100)
+x1_mesh, x2_mesh = np.meshgrid(x1_values, x2_values)
+input_mesh = np.column_stack((x1_mesh.flatten(), x2_mesh.flatten()))
 
-# settings
+# function to plot 3D surface
+def plot_3d_surface(ax, title, x, y, z):
+    ax.plot_surface(x, y, z, cmap='viridis', alpha=0.8, edgecolor='k')
+    ax.set_xlabel('X1')
+    ax.set_ylabel('X2')
+    ax.set_zlabel('Y')
+    ax.set_title(title)
+
+# true function values
+true_function_values = np.array([f_3_d_2_generator.problem(input) for input in input_mesh])
+true_function_values = true_function_values.reshape(x1_mesh.shape)
+
+
+
+
+# Plotting for SGD-optimized network
+fig_sgd = plt.figure(figsize=(15, 5))
+# NN with SGD optimization
+sgd_network = hidden2_FNN(2, 50, 20, 1)
+# plot the initial function of SGD-optimized network
+ax1_sgd = fig_sgd.add_subplot(131, projection='3d')
+with torch.no_grad():
+    sgd_initial_y = sgd_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
+sgd_initial_y = sgd_initial_y.reshape(x1_mesh.shape)
+plot_3d_surface(ax1_sgd, 'Initial Function (SGD)', x1_mesh, x2_mesh, sgd_initial_y)
+
+# training settings
 num_epochs = 5000
-sgd_learning_rate = 0.001
+sgd_learning_rate = 0.0001
 criterion = nn.MSELoss()
 sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
 
@@ -54,9 +83,32 @@ sgd_best_params = np.array(flatten_list(sgd_best_params))
 predicted_y = sgd_network(data_x)
 sgd_best_loss = criterion(predicted_y, data_y).item()
 
+# function learned with SGD
+ax2_sgd = fig_sgd.add_subplot(132, projection='3d')
+with torch.no_grad():
+    sgd_predicted_y = sgd_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
+sgd_predicted_y = sgd_predicted_y.reshape(x1_mesh.shape)
+plot_3d_surface(ax2_sgd, 'Function Learned with SGD', x1_mesh, x2_mesh, sgd_predicted_y)
 
-# EA optimization
-ea_network = hidden2_FNN(3, 50, 20, 1)
+# True function
+ax3_sgd = fig_sgd.add_subplot(133, projection='3d')
+plot_3d_surface(ax3_sgd, 'True Function', x1_mesh, x2_mesh, true_function_values)
+
+plt.suptitle('SGD-Optimized Network')
+
+
+
+
+# Plotting for EA-optimized network
+fig_ea = plt.figure(figsize=(15, 5))
+# NN with EA optimization
+ea_network = hidden2_FNN(2, 50, 20, 1)
+# Initial function of EA-optimized network
+ax1_ea = fig_ea.add_subplot(131, projection='3d')
+with torch.no_grad():
+    ea_initial_y = ea_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
+ea_initial_y = ea_initial_y.reshape(x1_mesh.shape)
+plot_3d_surface(ax1_ea, 'Initial Function (EA)', x1_mesh, x2_mesh, ea_initial_y)
 
 # define objective function
 def objective_function(parameters):
@@ -94,6 +146,21 @@ for i in range(ea_optimizer.budget):
 ea_best_params = ea_optimizer.provide_recommendation().value
 ea_best_loss = objective_function(ea_optimizer.provide_recommendation().value)
 
+# Function learned with EA
+ax2_ea = fig_ea.add_subplot(132, projection='3d')
+with torch.no_grad():
+    ea_predicted_y = ea_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
+ea_predicted_y = ea_predicted_y.reshape(x1_mesh.shape)
+plot_3d_surface(ax2_ea, 'Function Learned with EA', x1_mesh, x2_mesh, ea_predicted_y)
+
+# True function
+ax3_ea = fig_ea.add_subplot(133, projection='3d')
+plot_3d_surface(ax3_ea, 'True Function', x1_mesh, x2_mesh, true_function_values)
+
+plt.suptitle('EA-Optimized Network')
+
+
+
 
 # print final results
 print("SGD Best Parameters:", sgd_best_params)
@@ -101,7 +168,7 @@ print("SGD Best Loss:", sgd_best_loss)
 print("EA Best Parameters:", ea_best_params)
 print("EA Best Loss:", ea_best_loss)
 
-# plotting
+# plot the learning curve of loss
 plt.figure(figsize=(10, 6))
 plt.plot(epochs, epoch_losses, label='SGD')
 plt.plot(iterations, objective_values, label='EA')
@@ -111,3 +178,4 @@ plt.xlabel('Iteration/Epoch')
 plt.ylabel('MSE Loss (log scale)')
 plt.legend()
 plt.show()
+
