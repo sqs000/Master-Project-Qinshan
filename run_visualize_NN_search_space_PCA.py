@@ -5,6 +5,8 @@ from data import data_generator
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from scipy.spatial.distance import pdist, squareform
+from scipy.stats import spearmanr
 
 
 # Loss versus NN Parameters
@@ -55,6 +57,18 @@ plt.ylabel('PCA Component 2')
 
 # Add colorbar
 cbar = plt.colorbar(scatter, label='Loss')
+
+# Calculate pairwise distances in the high-dimensional space
+distance_matrix_solutions = pdist(param_values, metric='euclidean')
+distance_matrix_solutions = squareform(distance_matrix_solutions)
+
+# Calculate pairwise distances in the reduced-dimensional space
+distance_matrix_pca = pdist(param_values_pca, metric='euclidean')
+distance_matrix_pca = squareform(distance_matrix_pca)
+
+# Calculate the Spearman correlation coefficient between distances in the two spaces
+correlation_coefficient, _ = spearmanr(distance_matrix_solutions.flatten(), distance_matrix_pca.flatten())
+print(f"Spearman Correlation Coefficient: {correlation_coefficient}")
 
 # Show the plot
 plt.show()
