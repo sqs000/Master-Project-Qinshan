@@ -18,7 +18,6 @@ x1_values = np.linspace(-5, 5, 100)
 x2_values = np.linspace(-5, 5, 100)
 x1_mesh, x2_mesh = np.meshgrid(x1_values, x2_values)
 input_mesh = np.column_stack((x1_mesh.flatten(), x2_mesh.flatten()))
-
 # function to plot 3D surface
 def plot_3d_surface(ax, title, x, y, z):
     ax.plot_surface(x, y, z, cmap='viridis', alpha=0.8, edgecolor='k')
@@ -26,19 +25,16 @@ def plot_3d_surface(ax, title, x, y, z):
     ax.set_ylabel('X2')
     ax.set_zlabel('Y')
     ax.set_title(title)
-
 # true function values
 true_function_values = np.array([f_3_d_2_generator.problem(input) for input in input_mesh])
 true_function_values = true_function_values.reshape(x1_mesh.shape)
 
 
-
-
 # Plotting for SGD-optimized network
 fig_sgd = plt.figure(figsize=(15, 5))
-# NN with SGD optimization
+
+# create the NN with SGD optimization and plot its intial represented function
 sgd_network = hidden2_FNN(2, 50, 20, 1)
-# plot the initial function of SGD-optimized network
 ax1_sgd = fig_sgd.add_subplot(131, projection='3d')
 with torch.no_grad():
     sgd_initial_y = sgd_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
@@ -66,8 +62,8 @@ for epoch in range(num_epochs):
     epochs.append(epoch)
     epoch_losses.append(epoch_loss.item())
     # print the current best value at some intervals
-    if epoch % 100 == 0:
-        print(f"Epoch {epoch}: MSE_Loss = {epoch_loss.item()}")
+    if (epoch+1) % 100 == 0:
+        print(f"Epoch {epoch+1}: MSE_Loss = {epoch_loss.item()}")
 
 # get the final best parameters and loss
 sgd_best_params = [param.data.tolist() for param in sgd_network.parameters()]
@@ -80,17 +76,18 @@ def flatten_list(lst):
             result.append(el)
     return result
 sgd_best_params = np.array(flatten_list(sgd_best_params))
-predicted_y = sgd_network(data_x)
-sgd_best_loss = criterion(predicted_y, data_y).item()
+with torch.no_grad():
+    predicted_y = sgd_network(data_x)
+    sgd_best_loss = criterion(predicted_y, data_y).item()
 
-# function learned with SGD
+# plot the final function learned with SGD
 ax2_sgd = fig_sgd.add_subplot(132, projection='3d')
 with torch.no_grad():
     sgd_predicted_y = sgd_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
 sgd_predicted_y = sgd_predicted_y.reshape(x1_mesh.shape)
 plot_3d_surface(ax2_sgd, 'Function Learned with SGD', x1_mesh, x2_mesh, sgd_predicted_y)
 
-# True function
+# plot the true function
 ax3_sgd = fig_sgd.add_subplot(133, projection='3d')
 plot_3d_surface(ax3_sgd, 'True Function', x1_mesh, x2_mesh, true_function_values)
 
@@ -99,11 +96,11 @@ plt.suptitle('SGD-Optimized Network')
 
 
 
-# Plotting for EA-optimized network
+# plotting for EA-optimized network
 fig_ea = plt.figure(figsize=(15, 5))
-# NN with EA optimization
+
+# create the NN with EA optimization and plot its initial represented function
 ea_network = hidden2_FNN(2, 50, 20, 1)
-# Initial function of EA-optimized network
 ax1_ea = fig_ea.add_subplot(131, projection='3d')
 with torch.no_grad():
     ea_initial_y = ea_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
@@ -120,7 +117,7 @@ def objective_function(parameters):
     # evaluate the network with the parameters
     predicted_y = ea_network(data_x)
     criterion = nn.MSELoss()
-    # return the loss
+    # return the loss to be minimized
     return criterion(data_y, predicted_y).item()
 
 # choose an optimizer
@@ -139,21 +136,21 @@ for i in range(ea_optimizer.budget):
     iterations.append(i)
     objective_values.append(objective_value)
     # print the current best value at some intervals
-    if i % 100 == 0:
-        print(f"Iteration {i}: MSE_Loss = {objective_function(ea_optimizer.provide_recommendation().value)}")
+    if (i+1) % 100 == 0:
+        print(f"Iteration {i+1}: MSE_Loss = {objective_function(ea_optimizer.provide_recommendation().value)}")
 
 # get the final best parameters and loss
 ea_best_params = ea_optimizer.provide_recommendation().value
 ea_best_loss = objective_function(ea_optimizer.provide_recommendation().value)
 
-# Function learned with EA
+# plot the final function learned with EA
 ax2_ea = fig_ea.add_subplot(132, projection='3d')
 with torch.no_grad():
     ea_predicted_y = ea_network(torch.tensor(input_mesh, dtype=torch.float32)).numpy()
 ea_predicted_y = ea_predicted_y.reshape(x1_mesh.shape)
 plot_3d_surface(ax2_ea, 'Function Learned with EA', x1_mesh, x2_mesh, ea_predicted_y)
 
-# True function
+# plot the true function
 ax3_ea = fig_ea.add_subplot(133, projection='3d')
 plot_3d_surface(ax3_ea, 'True Function', x1_mesh, x2_mesh, true_function_values)
 
@@ -163,10 +160,10 @@ plt.suptitle('EA-Optimized Network')
 
 
 # print final results
-print("SGD Best Parameters:", sgd_best_params)
-print("SGD Best Loss:", sgd_best_loss)
-print("EA Best Parameters:", ea_best_params)
-print("EA Best Loss:", ea_best_loss)
+print("SGD final Parameters:", sgd_best_params)
+print("SGD final Loss:", sgd_best_loss)
+print("EA final Parameters:", ea_best_params)
+print("EA final Loss:", ea_best_loss)
 
 # plot the learning curve of loss
 plt.figure(figsize=(10, 6))
