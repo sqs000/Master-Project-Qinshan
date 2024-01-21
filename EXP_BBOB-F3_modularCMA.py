@@ -22,7 +22,7 @@ f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, i
 data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
 # repeated experiments
-n_repeatitions = 3
+n_repeatitions = 1
 # training settings
 num_epochs = 5000
 sgd_learning_rate = 0.0001
