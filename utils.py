@@ -17,6 +17,9 @@ def euclidean_distance(model1, model2):
     params2 = torch.cat([p.view(-1) for p in model2.parameters()])
     return torch.norm(params1 - params2).item()
 
+def vector_euclidean_dist(point1, point2):
+    return np.linalg.norm(point1 - point2)
+
 
 def heatmap_2d(x_range, y_range, function, x_label="Parameter 1", y_label="Parameter 2", title="Loss Landscape of Neural Network", colorbar_label="Loss", cmap='viridis', figsize=(8, 6)):
 

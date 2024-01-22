@@ -13,12 +13,12 @@ f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, i
 data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
 # repeated experiments
-n_repeatitions = 20
+n_repeatitions = 10
 # training settings
-num_epochs = 5000
+num_epochs = 10000
 sgd_learning_rate = 0.0001
 criterion = nn.MSELoss()
-ea_budget = 5000
+ea_budget = 10000
 # record processes
 sgd_training_losses = np.zeros((n_repeatitions, num_epochs))
 ea_0_training_losses = np.zeros((n_repeatitions, ea_budget))
