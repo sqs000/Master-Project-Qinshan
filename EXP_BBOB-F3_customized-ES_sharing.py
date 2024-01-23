@@ -131,21 +131,19 @@ if __name__ == "__main__":
 
     n_repeatitions = 5
     budget_iters = 500
-    exp_sets = [0.5, 1, 2, 5, 10, 20, 50, 100]
+    exp_sets = [1, 5, 10, 50, 100, 500]
     set_0_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_1_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_2_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_3_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_4_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_5_training_losses = np.zeros((n_repeatitions, budget_iters))
-    set_6_training_losses = np.zeros((n_repeatitions, budget_iters))
-    set_7_training_losses = np.zeros((n_repeatitions, budget_iters))
-    sets_training_losses = [set_0_training_losses, set_1_training_losses, set_2_training_losses, set_3_training_losses, set_4_training_losses, set_5_training_losses,
-                            set_6_training_losses, set_7_training_losses]
+    sets_training_losses = [set_0_training_losses, set_1_training_losses, set_2_training_losses, set_3_training_losses, set_4_training_losses, set_5_training_losses]
     for r in range(n_repeatitions):
         for i, set in enumerate(exp_sets):
             population, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, niche_radius=set)
             sets_training_losses[i][r] = best_losses
+            print(f"Set {i} is over.")
         print(f"Round {r} is over.")
     avg_set_0_training_losses = np.mean(set_0_training_losses, axis=0)
     avg_set_1_training_losses = np.mean(set_1_training_losses, axis=0)
@@ -153,19 +151,15 @@ if __name__ == "__main__":
     avg_set_3_training_losses = np.mean(set_3_training_losses, axis=0)
     avg_set_4_training_losses = np.mean(set_4_training_losses, axis=0)
     avg_set_5_training_losses = np.mean(set_5_training_losses, axis=0)
-    avg_set_6_training_losses = np.mean(set_6_training_losses, axis=0)
-    avg_set_7_training_losses = np.mean(set_7_training_losses, axis=0)
 
     # plot the learning curve of loss
     plt.figure(figsize=(10, 6))
-    plt.plot(iters, avg_set_0_training_losses, label='0.5')
-    plt.plot(iters, avg_set_1_training_losses, label='1')
-    plt.plot(iters, avg_set_2_training_losses, label='2')
-    plt.plot(iters, avg_set_3_training_losses, label='5')
-    plt.plot(iters, avg_set_4_training_losses, label='10')
-    plt.plot(iters, avg_set_5_training_losses, label='20')
-    plt.plot(iters, avg_set_6_training_losses, label='50')
-    plt.plot(iters, avg_set_7_training_losses, label='100')
+    plt.plot(iters, avg_set_0_training_losses, label='1')
+    plt.plot(iters, avg_set_1_training_losses, label='5')
+    plt.plot(iters, avg_set_2_training_losses, label='10')
+    plt.plot(iters, avg_set_3_training_losses, label='50')
+    plt.plot(iters, avg_set_4_training_losses, label='100')
+    plt.plot(iters, avg_set_5_training_losses, label='500')
     plt.yscale('log')
     plt.title('Customized ES optimization changing the niche radius')
     plt.xlabel('Number of Iterations')

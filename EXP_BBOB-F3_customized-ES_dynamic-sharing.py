@@ -20,10 +20,10 @@ def dynamic_niche_count(individual, parent_pop, population, n_niches, niche_radi
     dps = DPI(parent_pop, n_niches, niche_radius, obj_fun)
     peak_ind_flag = 0
     peak_index = 0
-    for peak in dps:
+    for i, peak in enumerate(dps):
         if vector_euclidean_dist(individual, peak) < niche_radius:
             peak_ind_flag = 1
-            peak_index = dps.index(peak)
+            peak_index = i
             break
     if peak_ind_flag:
         niche_sizes = size_niches(population, dps, niche_radius)
@@ -68,10 +68,10 @@ def DPI(population, n_niches, niche_radius, obj_fun):
 def size_niches(population, dps, niche_radius):
     niche_sizes = np.zeros(len(dps), dtype=int)
     for ind in population:
-        for peak in dps:
+        for i, peak in enumerate(dps):
             distance = vector_euclidean_dist(peak, ind)
             within_radius = distance < niche_radius
-            niche_sizes[dps.index(peak)] += int(within_radius)
+            niche_sizes[i] += int(within_radius)
     return niche_sizes.tolist()
 
 
@@ -144,7 +144,7 @@ def customized_ES(dim, budget, mu_, lambda_, obj_fun, n_niches, niche_radius):
         # record
         iterations.append(i)
         objective_values.append(fitness_values[0])
-        print(f"iteration {i}: {fitness_values[0]}")
+        # print(f"iteration {i}: {fitness_values[0]}")
 
     return init_pop, iterations, objective_values
 
@@ -184,6 +184,7 @@ if __name__ == "__main__":
         for i, set in enumerate(exp_sets):
             population, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, n_niches=set, niche_radius=1)
             sets_training_losses[i][r] = best_losses
+            print(f"Set {i} is over.")
         print(f"Round {r} is over.")
     avg_set_0_training_losses = np.mean(set_0_training_losses, axis=0)
     avg_set_1_training_losses = np.mean(set_1_training_losses, axis=0)
