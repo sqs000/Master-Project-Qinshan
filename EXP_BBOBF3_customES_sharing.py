@@ -28,8 +28,7 @@ def niche_count(individual, population, niche_radius):
 def f_sh(individual, population, obj_fun, niche_radius):
     f_ind = obj_fun(individual)
     m_ind = niche_count(individual, population, niche_radius)
-    w_sh = 100
-    return w_sh * m_ind + f_ind
+    return m_ind * f_ind
 
 
 # Initialization
@@ -131,7 +130,7 @@ if __name__ == "__main__":
 
     n_repeatitions = 5
     budget_iters = 500
-    exp_sets = [1, 5, 10, 50, 100, 500]
+    exp_sets = [0.1, 0.5, 1, 5, 10, 100]
     set_0_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_1_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_2_training_losses = np.zeros((n_repeatitions, budget_iters))
@@ -154,12 +153,12 @@ if __name__ == "__main__":
 
     # plot the learning curve of loss
     plt.figure(figsize=(10, 6))
-    plt.plot(iters, avg_set_0_training_losses, label='1')
-    plt.plot(iters, avg_set_1_training_losses, label='5')
-    plt.plot(iters, avg_set_2_training_losses, label='10')
-    plt.plot(iters, avg_set_3_training_losses, label='50')
-    plt.plot(iters, avg_set_4_training_losses, label='100')
-    plt.plot(iters, avg_set_5_training_losses, label='500')
+    plt.plot(iters, avg_set_0_training_losses, label='0.1')
+    plt.plot(iters, avg_set_1_training_losses, label='0.5')
+    plt.plot(iters, avg_set_2_training_losses, label='1')
+    plt.plot(iters, avg_set_3_training_losses, label='5')
+    plt.plot(iters, avg_set_4_training_losses, label='10')
+    plt.plot(iters, avg_set_5_training_losses, label='100')
     plt.yscale('log')
     plt.title('Customized ES optimization changing the niche radius')
     plt.xlabel('Number of Iterations')

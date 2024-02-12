@@ -40,8 +40,7 @@ def dynamic_niche_count(individual, parent_pop, population, n_niches, niche_radi
 def dyn_f_sh(individual, parent_pop, population, n_niches, niche_radius, obj_fun):
     f_ind = obj_fun(individual)
     m_ind = dynamic_niche_count(individual, parent_pop, population, n_niches, niche_radius, obj_fun)
-    w_sh = 100
-    return w_sh * m_ind + f_ind
+    return m_ind * f_ind
 
 
 # dynamic peak identification
@@ -174,7 +173,7 @@ if __name__ == "__main__":
 
     n_repeatitions = 5
     budget_iters = 500
-    exp_sets = [1, 2, 5, 10]
+    exp_sets = [1, 5, 10, 15]
     set_0_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_1_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_2_training_losses = np.zeros((n_repeatitions, budget_iters))
@@ -182,7 +181,7 @@ if __name__ == "__main__":
     sets_training_losses = [set_0_training_losses, set_1_training_losses, set_2_training_losses, set_3_training_losses]
     for r in range(n_repeatitions):
         for i, set in enumerate(exp_sets):
-            population, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, n_niches=set, niche_radius=1)
+            population, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, n_niches=set, niche_radius=0.1)
             sets_training_losses[i][r] = best_losses
             print(f"Set {i} is over.")
         print(f"Round {r} is over.")
@@ -194,9 +193,9 @@ if __name__ == "__main__":
     # plot the learning curve of loss
     plt.figure(figsize=(10, 6))
     plt.plot(iters, avg_set_0_training_losses, label='1')
-    plt.plot(iters, avg_set_1_training_losses, label='2')
-    plt.plot(iters, avg_set_2_training_losses, label='5')
-    plt.plot(iters, avg_set_3_training_losses, label='10')
+    plt.plot(iters, avg_set_1_training_losses, label='5')
+    plt.plot(iters, avg_set_2_training_losses, label='10')
+    plt.plot(iters, avg_set_3_training_losses, label='15')
     plt.yscale('log')
     plt.title('Customized ES optimization changing the number of niches')
     plt.xlabel('Number of Iterations')

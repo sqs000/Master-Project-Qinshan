@@ -32,7 +32,7 @@ if __name__ == "__main__":
         # return the loss to be minimized
         return criterion(data_y, predicted_y).item()
 
-    n_repeatitions = 10
+    n_repeatitions = 5
     budget_iters = 500
     ES_losses = np.zeros((n_repeatitions, budget_iters))
     ES_sharing_losses = np.zeros((n_repeatitions, budget_iters))
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     
     for r in range(n_repeatitions):
         population, eval_num, losses, iters, best_losses_ES = ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function)
-        population, iters, best_losses_ES_sharing = ES_sharing(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, niche_radius=1)
-        population, iters, best_losses_ES_dynamic = ES_dynamic(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, n_niches=10, niche_radius=1)
+        population, iters, best_losses_ES_sharing = ES_sharing(dim=num_parameters, budget=budget_iters, mu_=50, lambda_=300, obj_fun=objective_function, niche_radius=5)
+        population, iters, best_losses_ES_dynamic = ES_dynamic(dim=num_parameters, budget=budget_iters, mu_=50, lambda_=300, obj_fun=objective_function, n_niches=10, niche_radius=5)
         ES_losses[r] = best_losses_ES
         ES_sharing_losses[r] = best_losses_ES_sharing
         ES_dynamic_losses[r] = best_losses_ES_dynamic
@@ -104,9 +104,9 @@ if __name__ == "__main__":
     threeQ["ES"] = np.percentile(ES_final_losses, 75)
     threeQ["ES_sharing"] = np.percentile(ES_sharing_final_losses, 75)
     threeQ["ES_dynamic"] = np.percentile(ES_dynamic_final_losses, 75)
-    best_loss["ES"] = np.max(ES_final_losses)
-    best_loss["ES_sharing"] = np.max(ES_sharing_final_losses)
-    best_loss["ES_dynamic"] = np.max(ES_dynamic_final_losses)
+    best_loss["ES"] = np.min(ES_final_losses)
+    best_loss["ES_sharing"] = np.min(ES_sharing_final_losses)
+    best_loss["ES_dynamic"] = np.min(ES_dynamic_final_losses)
 
     # List of dictionaries
     list_of_dicts = [mean_loss, std_deviation, std_error, oneQ, median, threeQ, best_loss]
