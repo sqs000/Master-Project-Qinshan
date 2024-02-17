@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class data_generator:
     def __init__(self, suite_name, function, dimension, instance):        
@@ -20,8 +21,8 @@ class data_generator:
             output = self.problem(input)
             x.append(input)
             y.append([output])        
-        x_tensor = torch.FloatTensor(np.array(x))
-        y_tensor = torch.FloatTensor(np.array(y))
+        x_tensor = torch.tensor(np.array(x), dtype=torch.float32, device=device)
+        y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=device)
         return x_tensor, y_tensor
 
 
