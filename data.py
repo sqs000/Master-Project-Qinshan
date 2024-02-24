@@ -6,6 +6,7 @@ from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
 
 class data_generator:
     def __init__(self, suite_name, function, dimension, instance):        
