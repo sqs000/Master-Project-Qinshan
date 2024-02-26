@@ -21,6 +21,8 @@ if __name__ == "__main__":
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
     data_x.to(device)
     data_y.to(device)
+    torch.save(data_x, 'data_x.pt')
+    torch.save(data_y, 'data_y.pt')
     # experiment settings
     n_repeatitions = 3
     budget_generations = 400

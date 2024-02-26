@@ -8,3 +8,4 @@ other.zip
 other.7z
 requirements.txt
 *.npy
+*.pt
