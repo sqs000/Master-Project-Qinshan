@@ -10,19 +10,17 @@ from utils import vector_euclidean_dist
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
-ga_network = hidden2_FNN(2, 50, 20, 1)
-ga_network.to(device=device)
 
 
 # Genetic Algorithm optimization of Neural Network parameters
-def genetic_algorithm(num_generations, population_size, dim, p_m, niche_radius):
+def genetic_algorithm(num_generations, population_size, dim, p_m, niche_radius, obj_f):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
     loss_list = []
     for generation in range(num_generations):
         # Fitness Evaluation
-        fitness_scores = evaluate_fitness(population, niche_radius)
+        fitness_scores = evaluate_fitness(population, niche_radius, obj_f)
 
         # Selection
         selected_parents = select_parents(population, fitness_scores)
@@ -34,7 +32,7 @@ def genetic_algorithm(num_generations, population_size, dim, p_m, niche_radius):
         mutate(offspring, p_m)
 
         # Replace Old Population
-        population, loss = replace_population(population, offspring, population_size, niche_radius)
+        population, loss = replace_population(population, offspring, population_size, niche_radius, obj_f)
         best_loss = min(loss)
 
         # print(f"Generation {generation} loss: {best_loss}")
@@ -52,22 +50,12 @@ def initialize_population(mu, dim):
 
 
 # Fitness function
-def evaluate_fitness(population, niche_radius):
+def evaluate_fitness(population, niche_radius, obj_f):
     """ Evaluate sharing fitness of each individual in the population. """
-    loss_values = [objective_function(individual) for individual in population]
+    loss_values = [obj_f(individual) for individual in population]
     fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
     sharing_fitness_values = [fitness/niche_count(individual, population, niche_radius) for individual,fitness in zip(population,fitness_values)]
     return sharing_fitness_values
-
-def objective_function(parameters):
-    """ Assign NN with parameters, calculate and return the loss. """
-    new_params = torch.split(torch.tensor(parameters), [p.numel() for p in ga_network.parameters()])
-    with torch.no_grad():
-        for param, new_param_value in zip(ga_network.parameters(), new_params):
-            param.data.copy_(new_param_value.reshape(param.data.shape))
-    predicted_y = ga_network(data_x)
-    criterion = nn.MSELoss()
-    return criterion(data_y, predicted_y).item()
 
 def sharing(distance, niche_radius, alpha_sh=1):
     """ Sharing function. """
@@ -150,14 +138,14 @@ def mutate(offspring, mutation_rate):
 
 
 # Update Selection
-def replace_population(old_population, new_population, mu, niche_radius):
+def replace_population(old_population, new_population, mu, niche_radius, obj_f):
     """ Replace old population with new individuals. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
-    fitness_values = evaluate_fitness(population, niche_radius)
+    fitness_values = evaluate_fitness(population, niche_radius, obj_f)
     sorted_indices = np.argsort(fitness_values)[::-1]
     sorted_population = [population[i] for i in sorted_indices]
-    sorted_loss = [objective_function(ind) for ind in sorted_population]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
     # select
     selected_population = sorted_population[:mu]
     selected_loss = sorted_loss[:mu]
@@ -173,6 +161,16 @@ if __name__ == "__main__":
     # calculate num_parameters
     opt_network = hidden2_FNN(2, 50, 20, 1)
     num_parameters = sum(p.numel() for p in opt_network.parameters())
+    opt_network.to(device)
+    def objective_function(parameters):
+        """ Assign NN with parameters, calculate and return the loss. """
+        new_params = torch.split(torch.tensor(parameters), [p.numel() for p in opt_network.parameters()])
+        with torch.no_grad():
+            for param, new_param_value in zip(opt_network.parameters(), new_params):
+                param.data.copy_(new_param_value.reshape(param.data.shape))
+        predicted_y = opt_network(data_x)
+        criterion = nn.MSELoss()
+        return criterion(data_y, predicted_y).item()
     # exp_settings
     n_repeatitions = 5
     budget_generations = 200
@@ -188,7 +186,7 @@ if __name__ == "__main__":
     # running
     for r in range(n_repeatitions):
         for i, radius in enumerate(niche_radius_list):
-            final_pop, final_loss, generation_list, loss_list = genetic_algorithm(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=radius)
+            final_pop, final_loss, generation_list, loss_list = genetic_algorithm(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=radius, obj_f=objective_function)
             sets_training_losses[i][r] = loss_list
             print(f"Set {i} is over.")
         print(f"Round {r} is over.")

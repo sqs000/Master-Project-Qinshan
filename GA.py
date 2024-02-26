@@ -13,14 +13,14 @@ ga_network.to(device=device)
 
 
 # Genetic Algorithm optimization of Neural Network parameters
-def genetic_algorithm(num_generations, population_size, dim, p_m):
+def genetic_algorithm(num_generations, population_size, dim, p_m, obj_f):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
     loss_list = []
     for generation in range(num_generations):
         # Fitness Evaluation
-        fitness_scores = evaluate_fitness(population)
+        fitness_scores = evaluate_fitness(population, obj_f)
 
         # Selection
         selected_parents = select_parents(population, fitness_scores)
@@ -32,9 +32,9 @@ def genetic_algorithm(num_generations, population_size, dim, p_m):
         mutate(offspring, p_m)
 
         # Replace Old Population
-        population, loss = replace_population(population, offspring, population_size)
+        population, loss = replace_population(population, offspring, population_size, obj_f)
 
-        print(f"Generation {generation} loss: {loss[0]}")
+        # print(f"Generation {generation} loss: {loss[0]}")
         generation_list.append(generation)
         loss_list.append(loss[0])
     # Final population contains optimized individuals
@@ -47,19 +47,9 @@ def initialize_population(mu, dim):
     return population
 
 
-def objective_function(parameters):
-    """ Assign NN with parameters, calculate and return the loss. """
-    new_params = torch.split(torch.tensor(parameters), [p.numel() for p in ga_network.parameters()])
-    with torch.no_grad():
-        for param, new_param_value in zip(ga_network.parameters(), new_params):
-            param.data.copy_(new_param_value.reshape(param.data.shape))
-    predicted_y = ga_network(data_x)
-    criterion = nn.MSELoss()
-    return criterion(data_y, predicted_y).item()
-
-def evaluate_fitness(population):
+def evaluate_fitness(population, obj_f):
     """ Evaluate fitness of each individual in the population. """
-    loss_values = [objective_function(individual) for individual in population]
+    loss_values = [obj_f(individual) for individual in population]
     fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
     return fitness_values
 
@@ -125,11 +115,11 @@ def mutate(offspring, mutation_rate):
             continue
 
 
-def replace_population(old_population, new_population, mu):
+def replace_population(old_population, new_population, mu, obj_f):
     """ Replace old population with new individuals. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
-    loss_values = [objective_function(x) for x in population]
+    loss_values = [obj_f(x) for x in population]
     sorted_indices = np.argsort(loss_values)
     sorted_loss = [loss_values[i] for i in sorted_indices]
     sorted_population = [population[i] for i in sorted_indices]
@@ -145,6 +135,15 @@ if __name__ == "__main__":
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
     data_x.to(device=device)
     data_y.to(device=device)
+    def objective_function(parameters):
+        """ Assign NN with parameters, calculate and return the loss. """
+        new_params = torch.split(torch.tensor(parameters), [p.numel() for p in ga_network.parameters()])
+        with torch.no_grad():
+            for param, new_param_value in zip(ga_network.parameters(), new_params):
+                param.data.copy_(new_param_value.reshape(param.data.shape))
+        predicted_y = ga_network(data_x)
+        criterion = nn.MSELoss()
+        return criterion(data_y, predicted_y).item()
     opt_network = hidden2_FNN(2, 50, 20, 1)
     num_parameters = sum(p.numel() for p in opt_network.parameters())
-    final_pop, final_loss, generation_list, loss_list = genetic_algorithm(num_generations=1000, population_size=1000, dim=num_parameters, p_m=0.04)
+    final_pop, final_loss, generation_list, loss_list = genetic_algorithm(num_generations=1000, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function)
