@@ -1,3 +1,10 @@
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import torch
 import torch.nn as nn
 from network import NN_2_parameters
@@ -9,20 +16,15 @@ import numpy as np
 
 
 # Generate data (sphere model)
-f_1_d_2_generator = data_generator(suite_name="bbob", function=5, dimension=2, instance=1)
+f_1_d_2_generator = data_generator(suite_name="bbob", function=5, dimension=2, instance=1, device=torch.device("cpu"))
 data_x, data_y = f_1_d_2_generator.generate(data_size=200)
 
 
-# Define the model function with 2 parameters (bias is set to Flase)
-def model(x, y):
+# Define the objective function (MSE between true values and predicted values) built by the generated data and 2-parameter model
+def loss(x, y):
     network = NN_2_parameters()
     new_weight = torch.FloatTensor([[x, y]])
     network.fc1.weight = nn.Parameter(new_weight)
-    return network
-
-# Define the objective function (MSE between true values and predicted values) built by the generated data and 2-parameter model
-def loss(x, y):
-    network = model(x, y)
     predicted_y = network(data_x)
     criterion = nn.MSELoss()
     return criterion(data_y, predicted_y).detach().numpy()

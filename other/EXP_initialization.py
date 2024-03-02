@@ -1,11 +1,21 @@
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import network
 from data import data_generator
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from utils import init_weights, euclidean_distance
-from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter(log_dir="log\experiment_1", flush_secs=60)
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 # data generation settings
 suite_name = 'bbob'
@@ -35,10 +45,12 @@ data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 # build models
 model1 = network.FNN(input_size=input_size, hidden_size=hidden_size, output_size=output_size)
+model1.to(device)
 optimizer1 = optim.SGD(model1.parameters(), lr=lr)
 model1.apply(init_weights(weight=initial_weights[0], bias=initial_biases[0]))
 
 model2 = network.FNN(input_size=input_size, hidden_size=hidden_size, output_size=output_size)
+model2.to(device)
 optimizer2 = optim.SGD(model2.parameters(), lr=lr)
 model2.apply(init_weights(weight=initial_weights[1], bias=initial_biases[1]))
 
@@ -72,8 +84,4 @@ for epoch in range(num_epochs):
     average_loss1 = loss1 / len(data_loader)
     average_loss2 = loss2 / len(data_loader)
     print(f'Epoch [{epoch + 1}/{num_epochs}], Average Loss1: {average_loss1}, Average Loss2: {average_loss2}')
-    writer.add_scalar('train_loss_model_init1', average_loss1, epoch)
-    writer.add_scalar('train_loss_model_init2', average_loss2, epoch)
-    writer.add_scalar('euclidean_distance_init1&2', euclidean_distance(model1, model2), epoch)
-
-writer.close()
+    

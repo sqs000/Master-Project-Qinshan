@@ -9,14 +9,14 @@ import numpy as np
 
     
 # data generation
-f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
+f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
 data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
 # repeated experiments
 n_repeatitions = 10
 # training settings
 num_epochs = 10000
-sgd_learning_rate = 0.0001
+sgd_learning_rate = 0.00005
 criterion = nn.MSELoss()
 ea_budget = 10000
 # record processes

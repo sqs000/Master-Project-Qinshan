@@ -5,14 +5,13 @@ import torch
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# device = torch.device("cpu")
 
 class data_generator:
-    def __init__(self, suite_name, function, dimension, instance):        
+    def __init__(self, suite_name, function, dimension, instance, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):        
         self.dimension = dimension
         self.suite = ex.Suite(suite_name=suite_name, suite_instance='', suite_options='')
         self.problem = self.suite.get_problem_by_function_dimension_instance(function=function, dimension=dimension, instance=instance)
+        self.device = device
 
     def generate(self, data_size, x_min=-5, x_max=5):
         x = []
@@ -22,8 +21,8 @@ class data_generator:
             output = self.problem(input)
             x.append(input)
             y.append([output])        
-        x_tensor = torch.tensor(np.array(x), dtype=torch.float32, device=device)
-        y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=device)
+        x_tensor = torch.tensor(np.array(x), dtype=torch.float32, device=self.device)
+        y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=self.device)
         return x_tensor, y_tensor
 
 

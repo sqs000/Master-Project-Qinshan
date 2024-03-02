@@ -7,6 +7,14 @@
 #    cma.recombine()
 #    cma.adapt()
 
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
+
 from modcma import AskTellCMAES
 import torch
 import torch.nn as nn
@@ -16,6 +24,7 @@ import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
 # data generation
 f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
@@ -37,6 +46,7 @@ for round in range(n_repeatitions):
 
     # create the NN with SGD optimization
     sgd_network = hidden2_FNN(2, 50, 20, 1)
+    sgd_network.to(device)
     sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
 
     # start training
@@ -61,6 +71,7 @@ for round in range(n_repeatitions):
 
     # create the NN with EA optimization
     ea_network = hidden2_FNN(2, 50, 20, 1)
+    ea_network.to(device)
     num_parameters = sum(p.numel() for p in ea_network.parameters())
     cma = AskTellCMAES(d=num_parameters, budget=cma_budget, orthogonal=True, threshold_convergence=True, sample_sigma=True, mirrored="mirrored pairwise")
 

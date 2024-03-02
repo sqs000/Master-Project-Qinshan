@@ -1,4 +1,10 @@
-# to be written
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import torch
 import torch.nn as nn
 from network import FNN

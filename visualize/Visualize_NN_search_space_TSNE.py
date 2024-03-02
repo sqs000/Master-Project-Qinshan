@@ -1,3 +1,10 @@
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import torch
 import torch.nn as nn
 from network import hidden2_FNN
@@ -33,10 +40,10 @@ def generate_random_arrays(length, num_arrays, value_range):
 
 
 # Generate data
-f_3_d_3_generator = data_generator(suite_name="bbob", function=3, dimension=3, instance=1)
+f_3_d_3_generator = data_generator(suite_name="bbob", function=3, dimension=3, instance=1, device=torch.device("cpu"))
 data_x, data_y = f_3_d_3_generator.generate(data_size=300)
 # Generate NN parameters and corresponding loss
-num_samples = 10000
+num_samples = 100
 model_NN = hidden2_FNN(3, 50, 20, 1)
 num_parameters = sum(p.numel() for p in model_NN.parameters())
 param_values = generate_random_arrays(num_parameters, num_samples, [-100, 100])

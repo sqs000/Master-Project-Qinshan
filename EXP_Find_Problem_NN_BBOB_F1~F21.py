@@ -5,6 +5,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 
 # data generation settings
@@ -28,7 +29,7 @@ axes = axes.flatten()
 
 for function in range(1, 25, 1):
     # generate data
-    generator = data_generator(suite_name=suite_name, function=function, dimension=dimension, instance=instance)
+    generator = data_generator(suite_name=suite_name, function=function, dimension=dimension, instance=instance, device=torch.device("cpu"))
     x, y = generator.generate(data_size=data_size)
     dataset = TensorDataset(x, y)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)

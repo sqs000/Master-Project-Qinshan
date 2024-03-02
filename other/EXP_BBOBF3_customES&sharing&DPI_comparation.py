@@ -1,3 +1,10 @@
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import numpy as np
 from data import data_generator
 from network import hidden2_FNN
@@ -11,6 +18,7 @@ import matplotlib.pyplot as plt
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def SGDOpt(network, data_x, data_y, criterion, n_epochs, sgd_lr):
     optimizer = optim.SGD(network.parameters(), lr=sgd_lr)

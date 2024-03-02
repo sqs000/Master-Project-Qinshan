@@ -1,34 +1,19 @@
+import sys
+import os
+# Get the current working directory
+current_directory = os.path.dirname(os.path.realpath(__file__))
+# Add the parent directory to the sys.path
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import numpy as np
 from data import data_generator
 from network import hidden2_FNN
-from utils import vector_euclidean_dist
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
 
-# sharing function
-def sharing(distance, niche_radius, alpha_sh=1):
-    if distance < niche_radius:
-        return 1 - pow(distance/niche_radius, alpha_sh)
-    else:
-        return 0
-
-
-# niche count
-def niche_count(individual, population, niche_radius):
-    count = 0
-    for ind in population:
-        dist = vector_euclidean_dist(ind, individual)
-        count += sharing(dist, niche_radius)
-    return count
-
-
-# shared fitness
-def f_sh(individual, population, obj_fun, niche_radius):
-    f_ind = obj_fun(individual)
-    m_ind = niche_count(individual, population, niche_radius)
-    return m_ind * f_ind
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # Initialization
@@ -62,47 +47,48 @@ def mutation(population, sigma, tau):
 
 
 # (mu + lambda) selection
-def selection(parent_pop, offspring_pop, parent_sigma, offspring_sigma, obj_fun, mu, niche_radius):
+def selection(parent_pop, offspring_pop, parent_sigma, offspring_sigma, obj_fun, mu):
     # mu + lambda
     population = np.concatenate((parent_pop, offspring_pop), axis=0)
     sigma = np.concatenate((parent_sigma, offspring_sigma))
     # evaluation and sort
-    fitness_values = [f_sh(x, population, obj_fun, niche_radius) for x in population]
+    fitness_values = [obj_fun(x) for x in population]
     sorted_indices = np.argsort(fitness_values)
+    sorted_fitness = [fitness_values[i] for i in sorted_indices]
     sorted_population = [population[i] for i in sorted_indices]
     sorted_sigma = [sigma[i] for i in sorted_indices]
     # select
     selected_population = sorted_population[:mu]
     selected_sigma = sorted_sigma[:mu]
-    # real objective
-    obj_func_values = [obj_fun(x) for x in population]
-    sorted_indices_obj = np.argsort(obj_func_values)
-    sorted_objective = [obj_func_values[i] for i in sorted_indices_obj]
-    return np.array(selected_population), np.array(selected_sigma), np.array(sorted_objective)
+    return np.array(selected_population), np.array(selected_sigma), sorted_fitness
 
 
-def customized_ES(dim, budget, mu_, lambda_, obj_fun, niche_radius):
+def customized_ES(dim, budget, mu_, lambda_, obj_fun):
 
     init_pop, init_sigma = initialization(mu_, dim)
     tau_0 =  1.0 / np.sqrt(dim)
     iterations = []
     objective_values = []
+    best_obj_values = []
+    n_evaluations = 0
     for i in range(budget):
         # recombination
         recombined_pop, recombined_sigma = recombination(init_pop, init_sigma, lambda_)
         # mutation
         mutated_pop, mutated_sigma = mutation(recombined_pop, recombined_sigma, tau_0)
         # selection
-        selected_pop, selected_sigma, fitness_values = selection(init_pop, mutated_pop, init_sigma, mutated_sigma, obj_fun, mu_, niche_radius)
+        selected_pop, selected_sigma, fitness_values = selection(init_pop, mutated_pop, init_sigma, mutated_sigma, obj_fun, mu_)
+        n_evaluations += mu_+lambda_
         # reset
         init_pop = selected_pop
         init_sigma = selected_sigma
         # record
         iterations.append(i)
-        objective_values.append(fitness_values[0])
+        objective_values.extend(fitness_values[::-1])
+        best_obj_values.append(fitness_values[0])
         # print(f"iteration {i}: {fitness_values[0]}")
 
-    return init_pop, iterations, objective_values
+    return init_pop, n_evaluations, objective_values, iterations, best_obj_values
 
     
 
@@ -113,6 +99,7 @@ if __name__ == "__main__":
 
     # model construction
     ea_network = hidden2_FNN(2, 50, 20, 1)
+    ea_network.to(device)
     num_parameters = sum(p.numel() for p in ea_network.parameters())
 
     # define objective function
@@ -128,9 +115,9 @@ if __name__ == "__main__":
         # return the loss to be minimized
         return criterion(data_y, predicted_y).item()
 
-    n_repeatitions = 5
+    n_repeatitions = 10
     budget_iters = 500
-    exp_sets = [0.1, 0.5, 1, 5, 10, 100]
+    exp_sets = [[15, 200], [15, 300], [15, 500], [30, 200], [30, 300], [30, 500]]
     set_0_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_1_training_losses = np.zeros((n_repeatitions, budget_iters))
     set_2_training_losses = np.zeros((n_repeatitions, budget_iters))
@@ -140,9 +127,8 @@ if __name__ == "__main__":
     sets_training_losses = [set_0_training_losses, set_1_training_losses, set_2_training_losses, set_3_training_losses, set_4_training_losses, set_5_training_losses]
     for r in range(n_repeatitions):
         for i, set in enumerate(exp_sets):
-            population, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function, niche_radius=set)
+            population, eval_num, losses, iters, best_losses = customized_ES(dim=num_parameters, budget=budget_iters, mu_=set[0], lambda_=set[1], obj_fun=objective_function)
             sets_training_losses[i][r] = best_losses
-            print(f"Set {i} is over.")
         print(f"Round {r} is over.")
     avg_set_0_training_losses = np.mean(set_0_training_losses, axis=0)
     avg_set_1_training_losses = np.mean(set_1_training_losses, axis=0)
@@ -153,14 +139,14 @@ if __name__ == "__main__":
 
     # plot the learning curve of loss
     plt.figure(figsize=(10, 6))
-    plt.plot(iters, avg_set_0_training_losses, label='0.1')
-    plt.plot(iters, avg_set_1_training_losses, label='0.5')
-    plt.plot(iters, avg_set_2_training_losses, label='1')
-    plt.plot(iters, avg_set_3_training_losses, label='5')
-    plt.plot(iters, avg_set_4_training_losses, label='10')
-    plt.plot(iters, avg_set_5_training_losses, label='100')
+    plt.plot(iters, avg_set_0_training_losses, label='15+200')
+    plt.plot(iters, avg_set_1_training_losses, label='15+300')
+    plt.plot(iters, avg_set_2_training_losses, label='15+500')
+    plt.plot(iters, avg_set_3_training_losses, label='30+200')
+    plt.plot(iters, avg_set_4_training_losses, label='30+300')
+    plt.plot(iters, avg_set_5_training_losses, label='30+500')
     plt.yscale('log')
-    plt.title('Customized ES optimization changing the niche radius')
+    plt.title('Customized ES optimization changing mu+lambda')
     plt.xlabel('Number of Iterations')
     plt.ylabel('MSE Loss (log scale)')
     plt.legend()

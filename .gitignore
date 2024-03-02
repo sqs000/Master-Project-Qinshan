@@ -1,11 +1,7 @@
 coco-master
-other
 __pycache__
 .vscode
+.venv
 log
 test.py
-other.zip
-other.7z
-requirements.txt
-*.npy
-*.pt
+results

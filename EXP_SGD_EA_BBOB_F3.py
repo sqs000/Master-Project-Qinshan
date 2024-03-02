@@ -9,7 +9,7 @@ import numpy as np
 
     
 # data generation
-f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
+f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
 data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
 
@@ -43,7 +43,7 @@ plot_3d_surface(ax1_sgd, 'Initial Function (SGD)', x1_mesh, x2_mesh, sgd_initial
 
 # training settings
 num_epochs = 5000
-sgd_learning_rate = 0.0001
+sgd_learning_rate = 0.00005
 criterion = nn.MSELoss()
 sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
 
