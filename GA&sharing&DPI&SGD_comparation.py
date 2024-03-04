@@ -7,7 +7,6 @@ from GA_dynamic import genetic_algorithm as ga_dynamic
 from SGD import SGDOpt
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import matplotlib.pyplot as plt
 
 

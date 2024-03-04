@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from network import hidden2_FNN
 from data import data_generator
-from nevergrad.optimization import optimizerlib
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
