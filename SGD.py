@@ -42,13 +42,11 @@ if __name__ == "__main__":
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
-    data_x.to(device)
-    data_y.to(device)
 
     # training settings
     n_repeatitions = 20
-    num_epochs = 500
-    sgd_learning_rates = [0.00001, 0.00005, 0.0001, 0.0003]
+    num_epochs = 1000
+    sgd_learning_rates = [0.00001, 0.00005, 0.0001, 0.0005]
     criterion = nn.MSELoss()
     set_0_training_losses = np.zeros((n_repeatitions, num_epochs))
     set_1_training_losses = np.zeros((n_repeatitions, num_epochs))
@@ -70,11 +68,15 @@ if __name__ == "__main__":
     avg_set_3_training_losses = np.mean(set_3_training_losses, axis=0)
     # print(best_params.shape)
     # plot the learning curve of loss
+    print(f"set 0: {avg_set_0_training_losses[-1]}")
+    print(f"set 1: {avg_set_1_training_losses[-1]}")
+    print(f"set 2: {avg_set_2_training_losses[-1]}")
+    print(f"set 3: {avg_set_3_training_losses[-1]}")
     plt.figure(figsize=(10, 6))
     plt.plot(epochs, avg_set_0_training_losses, label='1e^-5')
     plt.plot(epochs, avg_set_1_training_losses, label='5e^-5')
     plt.plot(epochs, avg_set_2_training_losses, label='1e^-4')
-    plt.plot(epochs, avg_set_3_training_losses, label='3e^-4')
+    plt.plot(epochs, avg_set_3_training_losses, label='5e^-4')
     plt.yscale('log')
     plt.title('The NN training loss curve using SGD (varying the learning rate)')
     plt.xlabel('Epochs')

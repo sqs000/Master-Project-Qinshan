@@ -10,19 +10,19 @@ import torch
 
 # data generation settings
 suite_name = 'bbob'
-dimension  = 3
+dimension  = 2
 instance   = 1
-data_size  = 1000
+data_size  = 5000
 # model settings
-input_size = 3
+input_size = 2
 hidden_size_1 = 50
 hidden_size_2 = 20
 output_size = 1
 criterion = nn.MSELoss()
 # training settings
-batch_size = 64
-lr = 0.001
-num_epochs = 300
+batch_size = 5000
+lr = 0.00001
+num_epochs = 1000
 # plotting
 fig, axes = plt.subplots(nrows=4, ncols=6, figsize=(12, 8))
 axes = axes.flatten()

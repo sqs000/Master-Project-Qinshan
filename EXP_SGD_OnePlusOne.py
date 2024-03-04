@@ -42,7 +42,7 @@ sgd_initial_y = sgd_initial_y.reshape(x1_mesh.shape)
 plot_3d_surface(ax1_sgd, 'Initial Function (SGD)', x1_mesh, x2_mesh, sgd_initial_y)
 
 # training settings
-num_epochs = 5000
+num_epochs = 1000
 sgd_learning_rate = 0.00005
 criterion = nn.MSELoss()
 sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
@@ -122,7 +122,7 @@ def objective_function(parameters):
 
 # choose an optimizer
 num_parameters = sum(p.numel() for p in ea_network.parameters())
-ea_optimizer = optimizerlib.OnePlusOne(parametrization=num_parameters, budget=5000)
+ea_optimizer = optimizerlib.OnePlusOne(parametrization=num_parameters, budget=1000)
 
 # start training
 iterations = []
