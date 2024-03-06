@@ -23,16 +23,16 @@ if __name__ == "__main__":
     torch.save(data_x, 'data_x.pt')
     torch.save(data_y, 'data_y.pt')
     # experiment settings
-    n_repeatitions = 3
+    n_repetitions = 3
     budget_generations = 400
     sgd_lr = 0.00005
     criterion = nn.MSELoss()
     # result collection
     # loss
-    sgd_losses = np.zeros((n_repeatitions, budget_generations))
-    ga_losses = np.zeros((n_repeatitions, budget_generations))
-    ga_sharing_losses = np.zeros((n_repeatitions, budget_generations))
-    ga_dynamic_losses = np.zeros((n_repeatitions, budget_generations))
+    sgd_losses = np.zeros((n_repetitions, budget_generations))
+    ga_losses = np.zeros((n_repetitions, budget_generations))
+    ga_sharing_losses = np.zeros((n_repetitions, budget_generations))
+    ga_dynamic_losses = np.zeros((n_repetitions, budget_generations))
     # final population
     sgd_params = []
     ga_params = []
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     ga_sharing_results = []
     ga_dynamic_results = []
     # start running
-    for r in range(n_repeatitions):
+    for r in range(n_repetitions):
         opt_network = hidden2_FNN(2, 50, 20, 1)
         opt_network.to(device)
         num_parameters = sum(p.numel() for p in opt_network.parameters())
@@ -79,15 +79,15 @@ if __name__ == "__main__":
         
         print(f"Round {r} is over.")
 
-    np.save("sgd_params", np.array(sgd_params))
-    np.save("ga_params", np.array(ga_params))
-    np.save("ga_sharing_params", np.array(ga_sharing_params))
-    np.save("ga_dynamic_params", np.array(ga_dynamic_params))
+    np.save("results/GA/sgd_params", np.array(sgd_params))
+    np.save("results/GA/ga_params", np.array(ga_params))
+    np.save("results/GA/ga_sharing_params", np.array(ga_sharing_params))
+    np.save("results/GA/ga_dynamic_params", np.array(ga_dynamic_params))
     
-    np.save("sgd_results", np.array(sgd_results))
-    np.save("ga_results", np.array(ga_results))
-    np.save("ga_sharing_results", np.array(ga_sharing_results))
-    np.save("ga_dynamic_results", np.array(ga_dynamic_results))
+    np.save("results/GA/sgd_results", np.array(sgd_results))
+    np.save("results/GA/ga_results", np.array(ga_results))
+    np.save("results/GA/ga_sharing_results", np.array(ga_sharing_results))
+    np.save("results/GA/ga_dynamic_results", np.array(ga_dynamic_results))
 
     avg_sgd_losses = np.mean(sgd_losses, axis=0)
     avg_ga_losses = np.mean(ga_losses, axis=0)
