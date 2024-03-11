@@ -1,7 +1,4 @@
 coco-master
 __pycache__
 .vscode
-.venv
-log
 results
-xzy.py
