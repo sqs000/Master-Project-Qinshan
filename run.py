@@ -1,7 +1,7 @@
 import argparse
 from data import data_generator
 from network import hidden2_FNN
-from SGD import SGDOpt
+from SGD import SGDBatchOpt
 from GA import genetic_algorithm as ga
 from GA_sharing import genetic_algorithm as ga_sharing
 from GA_dynamic import genetic_algorithm as ga_dynamic
@@ -22,6 +22,7 @@ parser.add_argument('algorithm', type=str, help='NN Optimization Algorithm in [S
 parser.add_argument('numberofevaluations', type=int, help='The number of loss function evaluations during NN optimization')
 # optional arguments
 parser.add_argument('-l', '--learningrate', type=float, help='The learning rate for SGD')
+parser.add_argument('-b', '--batchsize', type=int, help='The batch size for SGD')
 parser.add_argument('-p', '--populationsize', type=int, help='The population size for GAs')
 parser.add_argument('-m', '--mutationrate', type=float, help='The mutation rate for GAs')
 parser.add_argument('-r', '--nicheradius', type=float, help='The niche radius for GA_sharing or GA_dynamic')
@@ -46,10 +47,11 @@ if args.algorithm == "SGD":
     criterion = nn.MSELoss()
     budget_generations = args.numberofevaluations
     sgd_lr = args.learningrate
-    final_ind, final_loss, epochs, epoch_losses = SGDOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr)
-    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_f-ind_i-'+str(INSTANCE), final_ind)
-    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_f-loss_i-'+str(INSTANCE), np.array([final_loss]))
-    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_losses_i-'+str(INSTANCE), np.array(epoch_losses))
+    batch_size = args.batchsize
+    final_ind, final_loss, epochs, epoch_losses = SGDBatchOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr, batch_size)
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-ind_i-'+str(INSTANCE), final_ind)
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-loss_i-'+str(INSTANCE), np.array([final_loss]))
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_losses_i-'+str(INSTANCE), np.array(epoch_losses))
 else:
     def objective_function(parameters):
         """ Assign NN with parameters, calculate and return the loss. """
