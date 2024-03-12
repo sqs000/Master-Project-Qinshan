@@ -31,11 +31,11 @@ parser.add_argument('-i', '--instance', type=int, required=True, help='The rando
 # parse arguments
 args = parser.parse_args()
 
-
 # indicate random seed
 INSTANCE = args.instance                                                                             
 np.random.seed(INSTANCE)                                                                             
 random.seed(INSTANCE)
+torch.manual_seed(INSTANCE)
 # network construction
 opt_network = hidden2_FNN(2, 50, 20, 1)
 # data generation
@@ -47,7 +47,9 @@ if args.algorithm == "SGD":
     budget_generations = args.numberofevaluations
     sgd_lr = args.learningrate
     final_ind, final_loss, epochs, epoch_losses = SGDOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr)
-    print(f"The SGD final MSE loss after {budget_generations} epochs with lr {sgd_lr}: {final_loss}")
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_f-ind_i-'+str(INSTANCE), final_ind)
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_f-loss_i-'+str(INSTANCE), np.array([final_loss]))
+    np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_losses_i-'+str(INSTANCE), np.array(epoch_losses))
 else:
     def objective_function(parameters):
         """ Assign NN with parameters, calculate and return the loss. """
@@ -64,15 +66,21 @@ else:
     p_m = args.mutationrate
     if args.algorithm == "GA":
         final_pop_ga, final_loss_ga, generation_list, loss_list_ga = ga(budget_generations, population_size, num_parameters, p_m, objective_function)
-        print(f"The GA final MSE loss after {budget_generations} generations with popsize {population_size} and p_m {p_m}: {min(final_loss_ga)}")
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_f-pop_i-'+str(INSTANCE), final_pop_ga)
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga))
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_losses_i-'+str(INSTANCE), np.array(loss_list_ga))
     elif args.algorithm == "GA_sharing":
         niche_radius = args.nicheradius
         final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = ga_sharing(budget_generations, population_size, num_parameters, p_m, niche_radius, objective_function)
-        print(f"The GA_sharing final MSE loss after {budget_generations} generations with popsize {population_size}, p_m {p_m} and niche_radius {niche_radius}: {min(final_loss_ga_sharing)}")
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_f-pop_i-'+str(INSTANCE), final_pop_ga_sharing)
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga_sharing))
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_losses_i-'+str(INSTANCE), np.array(loss_list_ga_sharing))
     elif args.algorithm == "GA_dynamic":
         n_niches = args.numberofniches
         niche_radius = args.nicheradius
         final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = ga_dynamic(budget_generations, population_size, num_parameters, p_m, n_niches, niche_radius, objective_function)
-        print(f"The GA_dynamic final MSE loss after {budget_generations} generations with popsize {population_size}, p_m {p_m}, n_niches {n_niches} and niche_radius {niche_radius}: {min(final_loss_ga_dynamic)}")
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_N'+str(args.numberofniches)+'_f-pop_i-'+str(INSTANCE), final_pop_ga_dynamic)
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_N'+str(args.numberofniches)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga_dynamic))
+        np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_M'+str(args.mutationrate)+'_R'+str(args.nicheradius)+'_N'+str(args.numberofniches)+'_losses_i-'+str(INSTANCE), np.array(loss_list_ga_dynamic))
     else:
         print("Please select an optimization algorithm from this list: [SGD, GA, GA_sharing, GA_dynamic].")
