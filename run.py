@@ -1,6 +1,7 @@
 import argparse
 from data import data_generator
 from network import hidden2_FNN
+from Adam import AdamBatchOpt
 from SGD import SGDBatchOpt
 from GA import genetic_algorithm as ga
 from GA_sharing import genetic_algorithm as ga_sharing
@@ -20,7 +21,7 @@ parser = argparse.ArgumentParser(
         )
 # positional arguments
 parser.add_argument('function', type=int, choices=range(1, 25), help='BBOB Function Number in [1, 25)')
-parser.add_argument('algorithm', type=str, help='NN Optimization Algorithm in [SGD, GA, GA_sharing, GA_dynamic]')
+parser.add_argument('algorithm', type=str, help='NN Optimization Algorithm in [Adam, SGD, GA, GA_sharing, GA_dynamic]')
 parser.add_argument('numberofevaluations', type=int, help='The number of loss function evaluations during NN optimization')
 # optional arguments
 parser.add_argument('-l', '--learningrate', type=float, help='The learning rate for SGD')
@@ -49,12 +50,15 @@ data_x, data_y = bbob_data_generator.generate(data_size=5000)
 scaler = StandardScaler()
 data_x = torch.tensor(scaler.fit_transform(data_x, data_y), dtype=torch.float32, device=torch.device("cpu"))
 # run
-if args.algorithm == "SGD":
+if args.algorithm == "SGD" or args.algorithm == "Adam":
     criterion = nn.MSELoss()
-    budget_generations = args.numberofevaluations
-    sgd_lr = args.learningrate
+    budget_generations = math.ceil(args.numberofevaluations/(5000/args.batchsize))
+    lr = args.learningrate
     batch_size = args.batchsize
-    final_ind, final_loss, epochs, epoch_losses = SGDBatchOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr, batch_size)
+    if args.algorithm == "SGD":
+        final_ind, final_loss, epochs, epoch_losses = SGDBatchOpt(opt_network, data_x, data_y, criterion, budget_generations, lr, batch_size)
+    else:
+        final_ind, final_loss, epochs, epoch_losses = AdamBatchOpt(opt_network, data_x, data_y, criterion, budget_generations, lr, batch_size)
     np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-ind_i-'+str(INSTANCE), final_ind)
     np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-loss_i-'+str(INSTANCE), np.array([final_loss]))
     np.save('./results/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_losses_i-'+str(INSTANCE), np.array(epoch_losses))
