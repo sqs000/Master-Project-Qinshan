@@ -10,6 +10,8 @@ import torch.nn as nn
 import math
 import numpy as np
 import random
+from sklearn.preprocessing import StandardScaler
+
 
 # argparse
 parser = argparse.ArgumentParser(
@@ -32,6 +34,7 @@ parser.add_argument('-i', '--instance', type=int, required=True, help='The rando
 # parse arguments
 args = parser.parse_args()
 
+
 # indicate random seed
 INSTANCE = args.instance                                                                             
 np.random.seed(INSTANCE)                                                                             
@@ -42,6 +45,9 @@ opt_network = hidden2_FNN(2, 50, 20, 1)
 # data generation
 bbob_data_generator = data_generator(suite_name="bbob", function=args.function, dimension=2, instance=1, device=torch.device("cpu"))
 data_x, data_y = bbob_data_generator.generate(data_size=5000)
+# standardize the data
+scaler = StandardScaler()
+data_x = torch.tensor(scaler.fit_transform(data_x, data_y), dtype=torch.float32, device=torch.device("cpu"))
 # run
 if args.algorithm == "SGD":
     criterion = nn.MSELoss()
