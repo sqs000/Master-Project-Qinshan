@@ -20,9 +20,9 @@ parser = argparse.ArgumentParser(
             description='Run NN optimization on an indicated BBOB function using an indicated algorithm.'
         )
 # positional arguments
-parser.add_argument('function', type=int, choices=range(1, 25), help='BBOB Function Number in [1, 25)')
-parser.add_argument('algorithm', type=str, help='NN Optimization Algorithm in [Adam, SGD, GA, GA_sharing, GA_dynamic]')
-parser.add_argument('numberofevaluations', type=int, help='The number of loss function evaluations during NN optimization')
+parser.add_argument('--function', type=int, choices=range(1, 25), help='BBOB Function Number in [1, 25)')
+parser.add_argument('--algorithm', type=str, help='NN Optimization Algorithm in [Adam, SGD, GA, GA_sharing, GA_dynamic]')
+parser.add_argument('--numberofevaluations', type=int, help='The number of loss function evaluations during NN optimization')
 # optional arguments
 parser.add_argument('-l', '--learningrate', type=float, help='The learning rate for SGD')
 parser.add_argument('-b', '--batchsize', type=int, help='The batch size for SGD')
