@@ -52,7 +52,7 @@ data_x = torch.tensor(scaler.fit_transform(data_x, data_y), dtype=torch.float32,
 # run
 if args.algorithm == "SGD" or args.algorithm == "Adam":
     criterion = nn.MSELoss()
-    budget_generations = math.ceil(args.numberofevaluations/(5000/args.batchsize))
+    budget_generations = math.ceil(args.numberofevaluations/10000)
     lr = args.learningrate
     batch_size = args.batchsize
     if args.algorithm == "SGD":
@@ -73,7 +73,9 @@ else:
         criterion = nn.MSELoss()
         return criterion(data_y, predicted_y).item()
     population_size = args.populationsize
-    budget_generations = math.ceil(args.numberofevaluations/population_size)
+    budget_generations = math.ceil((args.numberofevaluations-(population_size*5000))/(population_size*5000))
+    if budget_generations < 1:
+        budget_generations = 1
     num_parameters = sum(p.numel() for p in opt_network.parameters())
     p_m = args.mutationrate
     if args.algorithm == "GA":
