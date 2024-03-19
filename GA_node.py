@@ -85,30 +85,31 @@ def select_parents(population, fitness_scores):
     return selected_parents
 
 
-def twopoint_layer_crossover(parent1, parent2):
+def uniform_node_crossover(parent1, parent2):
     assert len(parent1) == len(parent2), "Parents must have the same length"
-    crossover_layer_masks = [random.choice([True, False]) for _ in range(3)]
-    crossover_layer_n_params = [150, 1020, 21]
-    child1 = []
-    child2 = []
-    start = 0
-    for layer_mask, layer_n_params in zip(crossover_layer_masks, crossover_layer_n_params):
-        end = start + layer_n_params
-        if layer_mask:
-            child1.extend(parent2[start:end])
-            child2.extend(parent1[start:end])
+    parent1, parent2 = np.array(parent1), np.array(parent2)
+    child1, child2 = np.zeros_like(parent1), np.zeros_like(parent2)
+    # 50-node: 50*(2 + 1); 20-node: 20*(50 + 1); 1-node: 1*(20 + 1).
+    indices_1 = [list(range(w,w+2))+[b] for w, b in zip(range(0, 100, 2), range(100, 150, 1))]
+    indices_2 = [list(range(w,w+50))+[b] for w, b in zip(range(150, 1150, 50), range(1150, 1170, 1))]
+    indices_3 = [list(range(w,w+20))+[b] for w, b in zip(range(1170, 1190, 20), range(1190, 1191, 1))]
+    indices = indices_1 + indices_2 + indices_3
+    crossover_node_masks = [random.choice([True, False]) for _ in range(50+20+1)]
+    for index, crossover_mask in zip(indices, crossover_node_masks):
+        if crossover_mask:
+            child1[index] = parent2[index]
+            child2[index] = parent1[index]
         else:
-            child1.extend(parent1[start:end])
-            child2.extend(parent2[start:end])
-        start += layer_n_params
+            child1[index] = parent1[index]
+            child2[index] = parent2[index]
     return child1, child2
 
 def crossover(parents):
-    """ Perform crossover to create offspring. """
+    """ Perform uniform node crossover to create offspring. """
     offspring = []
     pairs = [(parents[i], parents[i+1]) for i in range(0, len(parents)-(len(parents)%2), 2)]
     for pair in pairs:
-        child1, child2 = twopoint_layer_crossover(pair[0], pair[1])
+        child1, child2 = uniform_node_crossover(pair[0], pair[1])
         offspring.append(child1)
         offspring.append(child2)
     return np.array(offspring)
