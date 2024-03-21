@@ -16,12 +16,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if __name__ == "__main__":
 
     # data generation
-    f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
+    f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=device)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
-    data_x.to(device)
-    data_y.to(device)
-    torch.save(data_x, 'data_x.pt')
-    torch.save(data_y, 'data_y.pt')
+    torch.save(data_x, "results/GA/data_x.pt")
+    torch.save(data_y, "results/GA/data_y.pt")
     # experiment settings
     n_repetitions = 3
     budget_generations = 400
@@ -58,9 +56,9 @@ if __name__ == "__main__":
             criterion = nn.MSELoss()
             return criterion(data_y, predicted_y).item()
         final_ind, final_loss, epochs, epoch_losses = SGDOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr)
-        final_pop_ga, final_loss_ga, generation_list, loss_list_ga = ga(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function)
-        final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = ga_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=5, obj_f=objective_function)
-        final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = ga_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function)
+        final_pop_ga, final_loss_ga, generation_list, loss_list_ga = ga(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_type="param")
+        final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = ga_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=5, obj_f=objective_function, crossover_type="param")
+        final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = ga_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function, crossover_type="param")
         
         sgd_losses[r] = epoch_losses
         ga_losses[r] = loss_list_ga
