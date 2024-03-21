@@ -45,6 +45,7 @@ if __name__ == "__main__":
     torch.manual_seed(INSTANCE)
     # network construction
     opt_network = hidden2_FNN(2, 50, 20, 1)
+    opt_network.to(torch.device("cpu"))
     # data generation
     bbob_data_generator = data_generator(suite_name="bbob", function=args.function, dimension=2, instance=1, device=torch.device("cpu"))
     data_x, data_y = bbob_data_generator.generate(data_size=5000)
