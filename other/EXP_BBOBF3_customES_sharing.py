@@ -14,9 +14,6 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
 # sharing function
 def sharing(distance, niche_radius, alpha_sh=1):
     if distance < niche_radius:
@@ -110,13 +107,15 @@ def customized_ES(dim, budget, mu_, lambda_, obj_fun, niche_radius):
         # record
         iterations.append(i)
         objective_values.append(fitness_values[0])
-        # print(f"iteration {i}: {fitness_values[0]}")
+        print(f"iteration {i}: {fitness_values[0]}")
 
     return init_pop, iterations, objective_values
 
     
 
 if __name__ == "__main__":
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)

@@ -13,9 +13,6 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
 # Initialization
 def initialization(mu, dim):
     parent = np.zeros(shape=(mu, dim))
@@ -86,13 +83,15 @@ def customized_ES(dim, budget, mu_, lambda_, obj_fun):
         iterations.append(i)
         objective_values.extend(fitness_values[::-1])
         best_obj_values.append(fitness_values[0])
-        # print(f"iteration {i}: {fitness_values[0]}")
+        print(f"iteration {i}: {fitness_values[0]}")
 
     return init_pop, n_evaluations, objective_values, iterations, best_obj_values
 
     
 
 if __name__ == "__main__":
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
