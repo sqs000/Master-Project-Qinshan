@@ -123,7 +123,7 @@ def GA(num_generations, population_size, dim, p_m, obj_f, crossover_type):
         # Replace Old Population
         population, loss = replace_population(population, offspring, population_size, obj_f)
 
-        print(f"Generation {generation} loss: {loss[0]}")
+        # print(f"Generation {generation} loss: {loss[0]}")
         generation_list.append(generation)
         loss_list.append(loss[0])
     # Final population contains optimized individuals
@@ -152,7 +152,7 @@ def GA_sharing(num_generations, population_size, dim, p_m, niche_radius, obj_f, 
         population, loss = replace_population_sharing(population, offspring, population_size, niche_radius, obj_f)
         best_loss = min(loss)
 
-        print(f"Generation {generation} loss: {best_loss}")
+        # print(f"Generation {generation} loss: {best_loss}")
         generation_list.append(generation)
         loss_list.append(best_loss)
     # Final population contains optimized individuals
@@ -181,7 +181,7 @@ def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radiu
         population, loss = replace_population_dynamic(population, offspring, population_size, n_niches, niche_radius, obj_f)
         best_loss = min(loss)
 
-        print(f"Generation {generation} loss: {best_loss}")
+        # print(f"Generation {generation} loss: {best_loss}")
         generation_list.append(generation)
         loss_list.append(best_loss)
     # Final population contains optimized individuals

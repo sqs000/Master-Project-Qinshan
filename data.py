@@ -4,6 +4,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 class data_generator:
@@ -20,8 +21,10 @@ class data_generator:
             input = np.random.uniform(x_min, x_max, self.dimension)
             output = self.problem(input)
             x.append(input)
-            y.append([output])        
-        x_tensor = torch.tensor(np.array(x), dtype=torch.float32, device=self.device)
+            y.append([output])
+        # standardize the data
+        scaler = StandardScaler()
+        x_tensor = torch.tensor(scaler.fit_transform(x, y), dtype=torch.float32, device=self.device)        
         y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=self.device)
         return x_tensor, y_tensor
 

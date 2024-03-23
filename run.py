@@ -7,7 +7,6 @@ import torch.nn as nn
 import math
 import numpy as np
 import random
-from sklearn.preprocessing import StandardScaler
 
 
 if __name__ == "__main__":
@@ -45,9 +44,6 @@ if __name__ == "__main__":
     # data generation
     bbob_data_generator = data_generator(suite_name="bbob", function=args.function, dimension=2, instance=1, device=torch.device("cpu"))
     data_x, data_y = bbob_data_generator.generate(data_size=5000)
-    # standardize the data
-    scaler = StandardScaler()
-    data_x = torch.tensor(scaler.fit_transform(data_x, data_y), dtype=torch.float32, device=torch.device("cpu"))
     # run
     if args.algorithm == "SGD" or args.algorithm == "Adam":
         criterion = nn.MSELoss()
