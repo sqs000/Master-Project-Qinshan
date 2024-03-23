@@ -1,22 +1,21 @@
+import sys
+import os
+current_directory = os.path.dirname(os.path.realpath(__file__))
+parent_directory = os.path.join(current_directory, '..')
+sys.path.append(parent_directory)
 import numpy as np
 from data import data_generator
 from network import hidden2_FNN
-from GA import genetic_algorithm as ga
-from GA_sharing import genetic_algorithm as ga_sharing
-from GA_dynamic import genetic_algorithm as ga_dynamic
-from SGD import SGDOpt
+from algorithm import SGDOpt, GA, GA_sharing, GA_dynamic
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
 if __name__ == "__main__":
 
     # data generation
-    f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=device)
+    f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
     torch.save(data_x, "results/GA/data_x.pt")
     torch.save(data_y, "results/GA/data_y.pt")
@@ -44,7 +43,7 @@ if __name__ == "__main__":
     # start running
     for r in range(n_repetitions):
         opt_network = hidden2_FNN(2, 50, 20, 1)
-        opt_network.to(device)
+        opt_network.to(torch.device("cuda"))
         num_parameters = sum(p.numel() for p in opt_network.parameters())
         def objective_function(parameters):
             """ Assign NN with parameters, calculate and return the loss. """
@@ -56,9 +55,9 @@ if __name__ == "__main__":
             criterion = nn.MSELoss()
             return criterion(data_y, predicted_y).item()
         final_ind, final_loss, epochs, epoch_losses = SGDOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr)
-        final_pop_ga, final_loss_ga, generation_list, loss_list_ga = ga(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_type="param")
-        final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = ga_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=5, obj_f=objective_function, crossover_type="param")
-        final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = ga_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function, crossover_type="param")
+        final_pop_ga, final_loss_ga, generation_list, loss_list_ga = GA(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_type="param")
+        final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = GA_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=5, obj_f=objective_function, crossover_type="param")
+        final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = GA_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function, crossover_type="param")
         
         sgd_losses[r] = epoch_losses
         ga_losses[r] = loss_list_ga

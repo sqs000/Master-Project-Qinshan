@@ -1,38 +1,6 @@
-import torch
-import torch.nn as nn
-from network import hidden2_FNN
-from data import data_generator
 import numpy as np
 import random
-
-
-# Genetic Algorithm optimization of Neural Network parameters
-def genetic_algorithm(num_generations, population_size, dim, p_m, obj_f, crossover_type):
-    # Initialization
-    population = initialize_population(population_size, dim)
-    generation_list = []
-    loss_list = []
-    for generation in range(num_generations):
-        # Fitness Evaluation
-        fitness_scores = evaluate_fitness(population, obj_f)
-
-        # Selection
-        selected_parents = select_parents(population, fitness_scores)
-
-        # Sexual reproduction with uniform crossover (without mutation)
-        offspring = crossover(selected_parents, crossover_type)
-
-        # Asexual reproduction with uniformly distributed mutation
-        mutate(offspring, p_m)
-
-        # Replace Old Population
-        population, loss = replace_population(population, offspring, population_size, obj_f)
-
-        # print(f"Generation {generation} loss: {loss[0]}")
-        generation_list.append(generation)
-        loss_list.append(loss[0])
-    # Final population contains optimized individuals
-    return population, loss, generation_list, loss_list
+from utils import vector_euclidean_dist
 
 
 # Initialization
@@ -42,12 +10,92 @@ def initialize_population(mu, dim):
     return population
 
 
-# Fitness function
+# GA Fitness function
 def evaluate_fitness(population, obj_f):
     """ Evaluate fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
     fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
     return fitness_values
+
+# GA_sharing Fitness function
+def evaluate_fitness_sharing(population, niche_radius, obj_f):
+    """ Evaluate sharing fitness of each individual in the population. """
+    loss_values = [obj_f(individual) for individual in population]
+    fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
+    sharing_fitness_values = [fitness/niche_count(individual, population, niche_radius) for individual,fitness in zip(population,fitness_values)]
+    return sharing_fitness_values
+
+# GA_dynamic Fitness function
+def evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f):
+    """ Evaluate sharing fitness of each individual in the population. """
+    loss_values = [obj_f(individual) for individual in population]
+    fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
+    dps = DPI(population, n_niches, niche_radius, obj_f)
+    niche_sizes = size_niches(population, dps, niche_radius)
+    sharing_fitness_values = [fitness/dynamic_niche_count(individual, population, niche_radius, dps, niche_sizes) for individual,fitness in zip(population,fitness_values)]
+    return sharing_fitness_values
+
+def niche_count(individual, population, niche_radius):
+    """ Niche count m_i to be divided by the original fitness. """
+    count = 0
+    for ind in population:
+        dist = vector_euclidean_dist(ind, individual)
+        count += sharing(dist, niche_radius)
+    return count
+
+def dynamic_niche_count(individual, population, niche_radius, dps, niche_sizes):
+    """ Dynamic niche count m_i^dyn to be divided by the original fitness. """
+    peak_ind_flag = 0
+    peak_index = 0
+    for i, peak in enumerate(dps):
+        if vector_euclidean_dist(individual, peak) < niche_radius:
+            peak_ind_flag = 1
+            peak_index = i
+            break
+    if peak_ind_flag:
+        return niche_sizes[peak_index]
+    else:
+        count = 0
+        for ind in population:
+            dist = vector_euclidean_dist(ind, individual)
+            count += sharing(dist, niche_radius)
+        return count
+    
+def DPI(population, n_niches, niche_radius, obj_f):
+    """ Dynamic peak identification. """
+    losses = [obj_f(x) for x in population]
+    sorted_indices = np.argsort(losses)
+    sorted_population = [population[i] for i in sorted_indices]
+    i = 0
+    n_peaks = 0
+    dps = []
+    while n_peaks != n_niches and i < len(sorted_population):
+        peak_flag = 1
+        for peak in dps:
+            if vector_euclidean_dist(sorted_population[i], peak) < niche_radius:
+                peak_flag = 0
+        if peak_flag:
+            dps.append(sorted_population[i])
+            n_peaks += 1
+        i += 1
+    return dps
+
+def size_niches(population, dps, niche_radius):
+    """ Return the niche sizes in the population corresponding to dps. """
+    niche_sizes = np.zeros(len(dps), dtype=int)
+    for ind in population:
+        for i, peak in enumerate(dps):
+            distance = vector_euclidean_dist(peak, ind)
+            within_radius = distance < niche_radius
+            niche_sizes[i] += int(within_radius)
+    return niche_sizes.tolist()
+
+def sharing(distance, niche_radius, alpha_sh=1):
+    """ Sharing function. """
+    if distance < niche_radius:
+        return 1 - pow(distance/niche_radius, alpha_sh)
+    else:
+        return 0
 
 
 # Parent Selection
@@ -69,7 +117,7 @@ def roulette_wheel_selection_with_scaling(population, fitness_values):
     scaled_fitness = [fit - min_fitness for fit in fitness_values]
     total_scaled_fitness = sum(scaled_fitness)
     if total_scaled_fitness == 0:
-        selection_probabilities = [1 / len(scaled_fitness) for fit in scaled_fitness]
+        selection_probabilities = [1 / len(scaled_fitness)] * len(scaled_fitness)
     else:
         selection_probabilities = [fit / total_scaled_fitness for fit in scaled_fitness]
     selected_index = roulette_wheel_spin(selection_probabilities)
@@ -178,21 +226,31 @@ def replace_population(old_population, new_population, mu, obj_f):
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
+# Fitness-Sharing Update Selection
+def replace_population_sharing(old_population, new_population, mu, niche_radius, obj_f):
+    """ Replace old population with new individuals. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # evaluation and sort
+    fitness_values = evaluate_fitness_sharing(population, niche_radius, obj_f)
+    sorted_indices = np.argsort(fitness_values)[::-1]
+    sorted_population = [population[i] for i in sorted_indices]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
+    # select
+    selected_population = sorted_population[:mu]
+    selected_loss = sorted_loss[:mu]
+    return np.array(selected_population), selected_loss
 
-if __name__ == "__main__":
-    # data generation
-    f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
-    opt_network = hidden2_FNN(2, 50, 20, 1)
-    opt_network.to(torch.device("cpu"))
-    def objective_function(parameters):
-        """ Assign NN with parameters, calculate and return the loss. """
-        new_params = torch.split(torch.tensor(parameters), [p.numel() for p in opt_network.parameters()])
-        with torch.no_grad():
-            for param, new_param_value in zip(opt_network.parameters(), new_params):
-                param.data.copy_(new_param_value.reshape(param.data.shape))
-        predicted_y = opt_network(data_x)
-        criterion = nn.MSELoss()
-        return criterion(data_y, predicted_y).item()
-    num_parameters = sum(p.numel() for p in opt_network.parameters())
-    final_pop, final_loss, generation_list, loss_list = genetic_algorithm(num_generations=1000, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_type="param")
+# Dynamic-Fitness-Sharing Update Selection
+def replace_population_dynamic(old_population, new_population, mu, n_niches, niche_radius, obj_f):
+    """ Replace old population with new individuals. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # evaluation and sort
+    fitness_values = evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f)
+    sorted_indices = np.argsort(fitness_values)[::-1]
+    sorted_population = [population[i] for i in sorted_indices]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
+    # select
+    selected_population = sorted_population[:mu]
+    selected_loss = sorted_loss[:mu]
+    return np.array(selected_population), selected_loss
+
