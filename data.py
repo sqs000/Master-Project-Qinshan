@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 class data_generator:
-    def __init__(self, suite_name, function, dimension, instance, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):        
+    def __init__(self, suite_name, function, dimension, instance, device=torch.device("cpu")):        
         self.dimension = dimension
         self.suite = ex.Suite(suite_name=suite_name, suite_instance='', suite_options='')
         self.problem = self.suite.get_problem_by_function_dimension_instance(function=function, dimension=dimension, instance=instance)

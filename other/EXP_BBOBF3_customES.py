@@ -91,14 +91,12 @@ def customized_ES(dim, budget, mu_, lambda_, obj_fun):
 
 if __name__ == "__main__":
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
 
     # model construction
     ea_network = hidden2_FNN(2, 50, 20, 1)
-    ea_network.to(device)
     num_parameters = sum(p.numel() for p in ea_network.parameters())
 
     # define objective function

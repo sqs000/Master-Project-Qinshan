@@ -31,7 +31,6 @@ if __name__ == "__main__":
     for r in range(n_repeatitions):
         for i, lr in enumerate(sgd_learning_rates):
             sgd_network = hidden2_FNN(2, 50, 20, 1)
-            sgd_network.to(device=torch.device("cuda" if torch.cuda.is_available() else "cpu"))
             best_params, best_loss, epochs, epoch_losses = SGDOpt(sgd_network, data_x, data_y, criterion, num_epochs, lr)
             sets_training_losses[i][r] = epoch_losses
             print(f"Set {i} is over.")

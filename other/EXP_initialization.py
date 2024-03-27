@@ -16,9 +16,6 @@ from utils import init_weights, euclidean_distance
 
 if __name__ == "__main__":
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
     # data generation settings
     suite_name = 'bbob'
     function = 1
@@ -47,12 +44,10 @@ if __name__ == "__main__":
 
     # build models
     model1 = network.FNN(input_size=input_size, hidden_size=hidden_size, output_size=output_size)
-    model1.to(device)
     optimizer1 = optim.SGD(model1.parameters(), lr=lr)
     model1.apply(init_weights(weight=initial_weights[0], bias=initial_biases[0]))
 
     model2 = network.FNN(input_size=input_size, hidden_size=hidden_size, output_size=output_size)
-    model2.to(device)
     optimizer2 = optim.SGD(model2.parameters(), lr=lr)
     model2.apply(init_weights(weight=initial_weights[1], bias=initial_biases[1]))
 

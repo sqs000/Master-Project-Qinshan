@@ -26,8 +26,6 @@ import numpy as np
 
 
 if __name__ == "__main__":
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
@@ -49,7 +47,6 @@ if __name__ == "__main__":
 
         # create the NN with SGD optimization
         sgd_network = hidden2_FNN(2, 50, 20, 1)
-        sgd_network.to(device)
         sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
 
         # start training
@@ -74,7 +71,6 @@ if __name__ == "__main__":
 
         # create the NN with EA optimization
         ea_network = hidden2_FNN(2, 50, 20, 1)
-        ea_network.to(device)
         num_parameters = sum(p.numel() for p in ea_network.parameters())
         cma = AskTellCMAES(d=num_parameters, budget=cma_budget, orthogonal=True, threshold_convergence=True, sample_sigma=True, mirrored="mirrored pairwise")
 

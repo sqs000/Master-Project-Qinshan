@@ -1,8 +1,11 @@
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
 import argparse
 from data import data_generator
 from network import hidden2_FNN
 from algorithm import AdamBatchOpt, SGDBatchOpt, GA, GA_sharing, GA_dynamic
 import torch
+torch.set_num_threads(1)
 import torch.nn as nn
 import math
 import numpy as np
@@ -40,9 +43,9 @@ if __name__ == "__main__":
     torch.manual_seed(INSTANCE)
     # network construction
     opt_network = hidden2_FNN(2, 50, 20, 1)
-    opt_network.to(torch.device("cuda"))
+    opt_network.to(torch.device("cpu"))
     # data generation
-    bbob_data_generator = data_generator(suite_name="bbob", function=args.function, dimension=2, instance=1, device=torch.device("cuda"))
+    bbob_data_generator = data_generator(suite_name="bbob", function=args.function, dimension=2, instance=1, device=torch.device("cpu"))
     data_x, data_y = bbob_data_generator.generate(data_size=5000)
     # run
     if args.algorithm == "SGD" or args.algorithm == "Adam":

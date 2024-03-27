@@ -43,7 +43,6 @@ if __name__ == "__main__":
     # start running
     for r in range(n_repetitions):
         opt_network = hidden2_FNN(2, 50, 20, 1)
-        opt_network.to(torch.device("cuda"))
         num_parameters = sum(p.numel() for p in opt_network.parameters())
         def objective_function(parameters):
             """ Assign NN with parameters, calculate and return the loss. """

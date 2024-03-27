@@ -55,15 +55,11 @@ def writeFile(filename, mylist):
 
 if __name__ == "__main__":
                 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
     data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
-    data_x.to(device=device)
-    data_y.to(device=device)
     # construct the model and define objective function
     ea_network = hidden2_FNN(2, 50, 20, 1)
-    ea_network.to(device=device)
     num_parameters = sum(p.numel() for p in ea_network.parameters())
     def objective_function(parameters):
         # assign the network with specific parameters
@@ -98,7 +94,6 @@ if __name__ == "__main__":
 
     for r in range(n_repeatitions):
         sgd_network = hidden2_FNN(2, 50, 20, 1)
-        sgd_network.to(device=device)
         best_individual, epochs, epoch_losses = SGDOpt(sgd_network, data_x, data_y, criterion, budget_iters, sgd_lr)
         population_ES, eval_num, losses, iters, best_losses_ES = ES(dim=num_parameters, budget=budget_iters, mu_=15, lambda_=300, obj_fun=objective_function)
         population_ES_sharing, iters, best_losses_ES_sharing = ES_sharing(dim=num_parameters, budget=budget_iters, mu_=50, lambda_=300, obj_fun=objective_function, niche_radius=5)
