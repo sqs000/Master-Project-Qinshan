@@ -8,14 +8,14 @@ functions=(1 3 7 13 16 22)
 # Specify the algorithms
 algorithms=(Adam SGD GA GA_sharing GA_dynamic)
 
-# Loop through the functions
-for f in "${functions[@]}"
+# Repeat the run for the specified number of repetitions
+for ((rep=1; rep<=$repetitions; rep++))
 do
-    # Loop through the algorithms
-    for algo in "${algorithms[@]}"
+    # Loop through the functions
+    for f in "${functions[@]}"
     do
-        # Repeat the run for the specified number of repetitions
-        for ((rep=1; rep<=$repetitions; rep++))
+        # Loop through the algorithms
+        for algo in "${algorithms[@]}"
         do
 	    fname=${algo}_F${f}_${rep}
             if [ "$algo" == "Adam" ]; then

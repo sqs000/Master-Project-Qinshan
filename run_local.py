@@ -10,12 +10,12 @@ functions = [1, 3, 7, 13, 16, 22]
 # Specify the algorithms in a list
 algorithms = ["Adam", "SGD", "GA", "GA_sharing", "GA_dynamic"]
 
-# Loop through the functions
-for f in functions:
-    # Loop through the algorithms
-    for algo in algorithms:
-        # Repeat the run for the specified number of repetitions
-        for rep in range(1, repetitions + 1):
+# Repeat the run for the specified number of repetitions
+for rep in range(1, repetitions + 1):
+    # Loop through the functions
+    for f in functions:
+        # Loop through the algorithms
+        for algo in algorithms:
             if algo == "Adam" or algo == "SGD":
                 subprocess.run([
                     sys.executable, "run.py",
