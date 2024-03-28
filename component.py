@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from sklearn.cluster import KMeans
 from utils import vector_euclidean_dist
 
 
@@ -27,7 +28,7 @@ def evaluate_fitness_sharing(population, niche_radius, obj_f):
 
 # GA_dynamic Fitness function
 def evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f):
-    """ Evaluate sharing fitness of each individual in the population. """
+    """ Evaluate dynamic sharing fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
     fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
     dps = DPI(population, n_niches, niche_radius, obj_f)
@@ -96,6 +97,33 @@ def sharing(distance, niche_radius, alpha_sh=1):
         return 1 - pow(distance/niche_radius, alpha_sh)
     else:
         return 0
+    
+# GA_clustering fitness function
+def evaluate_fitness_clustering(population, n_clusters, alpha, obj_f):
+    """ Evaluate clustering fitness of each individual in the population. """
+    loss_values = [obj_f(individual) for individual in population]
+    fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
+    clustering_fitness_values = [fitness/clustering_denominator(idx, individual, population, n_clusters, alpha) for idx,(individual,fitness) in enumerate(zip(population,fitness_values))]
+    return clustering_fitness_values
+
+def clustering_denominator(idx, individual, population, n_clusters, alpha):
+    """ Computer the denominator of the clustering fitness. """
+    est = KMeans(n_clusters=n_clusters)
+    est.fit(population)
+    centers = est.cluster_centers_
+    labels = est.labels_
+    label = labels[idx]
+    center = centers[label]
+    n_c = np.count_nonzero(labels == label)
+    d_ic = vector_euclidean_dist(individual, center)
+    d_max = compute_d_max(population, labels, label, center)
+    return n_c * (1 - pow(d_ic/(2*d_max), alpha))
+
+def compute_d_max(population, labels, label, center):
+    """ Compute the max distance between an individual and its corresponding centroid in a specific niche. """
+    distances = [vector_euclidean_dist(population[i], center) for i in range(len(population)) if labels[i] == label]
+    return max(distances)
+
 
 
 # Parent Selection
@@ -254,3 +282,16 @@ def replace_population_dynamic(old_population, new_population, mu, n_niches, nic
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
+# Clustering-Fitness Update Selection
+def replace_population_clustering(old_population, new_population, mu, n_clusters, alpha, obj_f):
+    """ Replace old population with new individuals. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # evaluation and sort
+    fitness_values = evaluate_fitness_clustering(population, n_clusters, alpha, obj_f)
+    sorted_indices = np.argsort(fitness_values)[::-1]
+    sorted_population = [population[i] for i in sorted_indices]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
+    # select
+    selected_population = sorted_population[:mu]
+    selected_loss = sorted_loss[:mu]
+    return np.array(selected_population), selected_loss

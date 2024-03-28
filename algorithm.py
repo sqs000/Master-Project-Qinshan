@@ -3,7 +3,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader,TensorDataset
 import numpy as np
 from component import initialize_population, evaluate_fitness, evaluate_fitness_sharing, evaluate_fitness_dynamic,\
-select_parents, crossover, mutate, replace_population, replace_population_sharing, replace_population_dynamic
+evaluate_fitness_clustering, select_parents, crossover, mutate, replace_population, replace_population_sharing,\
+replace_population_dynamic, replace_population_clustering
 
 
 def AdamBatchOpt(network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
@@ -182,6 +183,35 @@ def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radiu
         best_loss = min(loss)
 
         # print(f"Generation {generation} loss: {best_loss}")
+        generation_list.append(generation)
+        loss_list.append(best_loss)
+    # Final population contains optimized individuals
+    return population, loss, generation_list, loss_list
+
+
+def GA_clustering(num_generations, population_size, dim, p_m, n_clusters, alpha, obj_f, crossover_type):
+    # Initialization
+    population = initialize_population(population_size, dim)
+    generation_list = []
+    loss_list = []
+    for generation in range(num_generations):
+        # Fitness Evaluation
+        fitness_scores = evaluate_fitness_clustering(population, n_clusters, alpha, obj_f)
+
+        # Selection
+        selected_parents = select_parents(population, fitness_scores)
+
+        # Sexual reproduction with uniform crossover (without mutation)
+        offspring = crossover(selected_parents, crossover_type)
+
+        # Asexual reproduction with uniformly distributed mutation
+        mutate(offspring, p_m)
+
+        # Replace Old Population
+        population, loss = replace_population_clustering(population, offspring, population_size, n_clusters, alpha, obj_f)
+        best_loss = min(loss)
+
+        print(f"Generation {generation} loss: {best_loss}")
         generation_list.append(generation)
         loss_list.append(best_loss)
     # Final population contains optimized individuals
