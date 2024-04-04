@@ -1,6 +1,7 @@
-coco-master
 __pycache__
+coco-master
 .vscode
 results
-test.py
 results3
+files
+test.py
