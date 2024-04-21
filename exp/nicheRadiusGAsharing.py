@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # running
     for r in range(n_repeatitions):
         for i, radius in enumerate(niche_radius_list):
-            final_pop, final_loss, generation_list, loss_list = GA_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=radius, obj_f=objective_function, crossover_type="param")
+            final_pop, final_loss, generation_list, loss_list = GA_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=radius, obj_f=objective_function, crossover_flag=True, crossover_type="param")
             sets_training_losses[i][r] = loss_list
             print(f"Set {i} is over.")
         print(f"Round {r} is over.")

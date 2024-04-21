@@ -103,7 +103,7 @@ def SGDOpt(network, data_x, data_y, criterion, n_epochs, sgd_lr):
     return best_params, epoch_loss.item(), epochs, epoch_losses
 
 
-def GA(num_generations, population_size, dim, p_m, obj_f, crossover_type):
+def GA(num_generations, population_size, dim, p_m, obj_f, crossover_flag, crossover_type):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
@@ -115,8 +115,11 @@ def GA(num_generations, population_size, dim, p_m, obj_f, crossover_type):
         # Selection
         selected_parents = select_parents(population, fitness_scores)
 
-        # Sexual reproduction with uniform crossover (without mutation)
-        offspring = crossover(selected_parents, crossover_type)
+        # Sexual reproduction with uniform crossover
+        if crossover_flag:
+            offspring = crossover(selected_parents, crossover_type)
+        else:
+            offspring = selected_parents
 
         # Asexual reproduction with uniformly distributed mutation
         mutate(offspring, p_m)
@@ -131,7 +134,7 @@ def GA(num_generations, population_size, dim, p_m, obj_f, crossover_type):
     return population, loss, generation_list, loss_list
 
 
-def GA_sharing(num_generations, population_size, dim, p_m, niche_radius, obj_f, crossover_type):
+def GA_sharing(num_generations, population_size, dim, p_m, niche_radius, obj_f, crossover_flag, crossover_type):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
@@ -143,8 +146,11 @@ def GA_sharing(num_generations, population_size, dim, p_m, niche_radius, obj_f, 
         # Selection
         selected_parents = select_parents(population, fitness_scores)
 
-        # Sexual reproduction with uniform crossover (without mutation)
-        offspring = crossover(selected_parents, crossover_type)
+        # Sexual reproduction with uniform crossover
+        if crossover_flag:
+            offspring = crossover(selected_parents, crossover_type)
+        else:
+            offspring = selected_parents
 
         # Asexual reproduction with uniformly distributed mutation
         mutate(offspring, p_m)
@@ -160,7 +166,7 @@ def GA_sharing(num_generations, population_size, dim, p_m, niche_radius, obj_f, 
     return population, loss, generation_list, loss_list
 
 
-def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radius, obj_f, crossover_type):
+def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radius, obj_f, crossover_flag, crossover_type):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
@@ -172,8 +178,11 @@ def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radiu
         # Selection
         selected_parents = select_parents(population, fitness_scores)
 
-        # Sexual reproduction with uniform crossover (without mutation)
-        offspring = crossover(selected_parents, crossover_type)
+        # Sexual reproduction with uniform crossover
+        if crossover_flag:
+            offspring = crossover(selected_parents, crossover_type)
+        else:
+            offspring = selected_parents
 
         # Asexual reproduction with uniformly distributed mutation
         mutate(offspring, p_m)
@@ -189,7 +198,7 @@ def GA_dynamic(num_generations, population_size, dim, p_m, n_niches, niche_radiu
     return population, loss, generation_list, loss_list
 
 
-def GA_clustering(num_generations, population_size, dim, p_m, n_clusters, alpha, obj_f, crossover_type):
+def GA_clustering(num_generations, population_size, dim, p_m, n_clusters, alpha, obj_f, crossover_flag, crossover_type):
     # Initialization
     population = initialize_population(population_size, dim)
     generation_list = []
@@ -201,8 +210,11 @@ def GA_clustering(num_generations, population_size, dim, p_m, n_clusters, alpha,
         # Selection
         selected_parents = select_parents(population, fitness_scores)
 
-        # Sexual reproduction with uniform crossover (without mutation)
-        offspring = crossover(selected_parents, crossover_type)
+        # Sexual reproduction with uniform crossover
+        if crossover_flag:
+            offspring = crossover(selected_parents, crossover_type)
+        else:
+            offspring = selected_parents
 
         # Asexual reproduction with uniformly distributed mutation
         mutate(offspring, p_m)

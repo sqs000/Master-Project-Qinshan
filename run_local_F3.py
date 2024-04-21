@@ -5,7 +5,7 @@ import sys
 repetitions = 5
 
 # Specify the BBOB function numbers in a list
-functions = [1, 3, 7, 13, 16, 22]
+functions = [3]
 
 # Specify the algorithms in a list
 algorithms = ["Adam", "SGD", "GA", "GA_sharing", "GA_dynamic"]
@@ -21,7 +21,7 @@ for rep in range(1, repetitions + 1):
                     sys.executable, "run.py",
                     "--function", str(f),
                     "--algorithm", algo,
-                    "--numberofevaluations", "500000000",
+                    "--numberofevaluations", "2000000000",
                     "-l", "0.00001",
                     "-b", "64",
                     "-i", str(rep)
@@ -32,7 +32,7 @@ for rep in range(1, repetitions + 1):
                         sys.executable, "run.py",
                         "--function", str(f),
                         "--algorithm", algo,
-                        "--numberofevaluations", "500000000",
+                        "--numberofevaluations", "2000000000",
                         "-p", "1000",
                         "-m", "0.04",
                         "-c", c,
@@ -44,7 +44,7 @@ for rep in range(1, repetitions + 1):
                         sys.executable, "run.py",
                         "--function", str(f),
                         "--algorithm", algo,
-                        "--numberofevaluations", "500000000",
+                        "--numberofevaluations", "2000000000",
                         "-p", "1000",
                         "-m", "0.04",
                         "-c", c,
@@ -57,7 +57,7 @@ for rep in range(1, repetitions + 1):
                         sys.executable, "run.py",
                         "--function", str(f),
                         "--algorithm", algo,
-                        "--numberofevaluations", "500000000",
+                        "--numberofevaluations", "2000000000",
                         "-p", "1000",
                         "-m", "0.04",
                         "-c", c,

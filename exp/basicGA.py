@@ -26,4 +26,4 @@ if __name__ == "__main__":
         criterion = nn.MSELoss()
         return criterion(data_y, predicted_y).item()
     num_parameters = sum(p.numel() for p in opt_network.parameters())
-    final_pop, final_loss, generation_list, loss_list = GA(num_generations=1000, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_type="param")
+    final_pop, final_loss, generation_list, loss_list = GA(num_generations=1000, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_flag=True, crossover_type="param")

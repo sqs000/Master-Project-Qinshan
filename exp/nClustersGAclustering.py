@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # running
     for r in range(n_repeatitions):
         for i, n in enumerate(n_clusters_list):
-            final_pop, final_loss, generation_list, loss_list = GA_clustering(budget_generations, 1000, num_parameters, 0.04, n, 1, objective_function, "param")
+            final_pop, final_loss, generation_list, loss_list = GA_clustering(budget_generations, 1000, num_parameters, 0.04, n, 1, objective_function, True, "param")
             sets_training_losses[i][r] = loss_list
             print(f"Set {i} is over.")
         print(f"Round {r} is over.")

@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 predicted_y = opt_network(data_x)
                 criterion = nn.MSELoss()
                 return criterion(data_y, predicted_y).item()
-            final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = GA_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function, crossover_type="param")
+            final_pop_ga_dynamic, final_loss_ga_dynamic, generation_list, loss_list_ga_dynamic = GA_dynamic(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, n_niches=50, niche_radius=5, obj_f=objective_function, crossover_flag=True, crossover_type="param")
             ga_dynamic_losses[r] = loss_list_ga_dynamic
         avg_ga_dynamic_losses = np.mean(ga_dynamic_losses, axis=0)
         ga_dynamic_function_losses[function-1] = avg_ga_dynamic_losses
