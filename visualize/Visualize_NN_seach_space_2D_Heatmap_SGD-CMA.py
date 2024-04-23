@@ -29,7 +29,7 @@ if __name__ == "__main__":
         network.fc1.weight = nn.Parameter(new_weight)
         predicted_y = network(data_x)
         criterion = nn.MSELoss()
-        return criterion(data_y, predicted_y).detach().numpy()
+        return criterion(predicted_y, data_y).detach().numpy()
 
     heatmap_2d(x_range=[-20, 20], y_range=[-20, 20], function=loss)
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         cma_model.fc1.weight = nn.Parameter(new_weight)
         predicted_y = cma_model(data_x)
         criterion = nn.MSELoss()
-        return criterion(data_y, predicted_y).detach().numpy()
+        return criterion(predicted_y, data_y).detach().numpy()
 
     recommendation = cma_optimizer.minimize(objective_f)
     print(f'Parameters: {recommendation.value}, Loss: {objective_f(recommendation.value)}')

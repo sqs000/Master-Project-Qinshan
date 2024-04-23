@@ -40,3 +40,21 @@ def heatmap_2d(x_range, y_range, function, x_label="Parameter 1", y_label="Param
     plt.ylabel(y_label)
     plt.title(title)
     plt.show()
+
+
+def assign_param(network, parameters):
+    """ Assign a network with specific parameters."""
+    new_params = torch.split(torch.tensor(parameters), [p.numel() for p in network.parameters()])
+    with torch.no_grad():
+        for param, new_param_value in zip(network.parameters(), new_params):
+            param.data.copy_(new_param_value.reshape(param.data.shape))
+
+
+def flatten_list(lst):
+        result = []
+        for el in lst:
+            if isinstance(el, list):
+                result.extend(flatten_list(el))
+            else:
+                result.append(el)
+        return result

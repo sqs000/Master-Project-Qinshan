@@ -29,7 +29,7 @@ if __name__ == "__main__":
         predicted_y = network(evaluation_x)
         criterion = nn.MSELoss()
         # return the loss
-        return criterion(evaluation_y, predicted_y).item()
+        return criterion(predicted_y, evaluation_y).item()
 
 
     # Generate NN parameters randomly

@@ -2,6 +2,10 @@ import numpy as np
 import random
 from sklearn.cluster import KMeans
 from utils import vector_euclidean_dist
+import torch
+import torch.optim as optim
+from torch.utils.data import DataLoader,TensorDataset
+from utils import assign_param, flatten_list
 
 
 # Initialization
@@ -295,3 +299,21 @@ def replace_population_clustering(old_population, new_population, mu, n_clusters
     selected_population = sorted_population[:mu]
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
+
+
+def sgd_step(population, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
+    """ Conduct SGD to the individuals in the population. """
+    dataset = TensorDataset(data_x, data_y)
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    optimizer = optim.SGD(network.parameters(), lr=sgd_lr)
+    for individual in population:
+        assign_param(network, individual)
+        for epoch in range(n_epochs):
+            for batch_inputs, batch_targets in data_loader:
+                optimizer.zero_grad()
+                batch_outputs = network(batch_inputs)
+                batch_loss = criterion(batch_outputs, batch_targets)
+                batch_loss.backward()
+                optimizer.step()
+        final_params = [param.data.tolist() for param in network.parameters()]
+        individual = np.array(flatten_list(final_params))

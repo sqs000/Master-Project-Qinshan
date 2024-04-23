@@ -28,7 +28,7 @@ if __name__ == "__main__":
                 param.data.copy_(new_param_value.reshape(param.data.shape))
         predicted_y = opt_network(data_x)
         criterion = nn.MSELoss()
-        return criterion(data_y, predicted_y).item()
+        return criterion(predicted_y, data_y).item()
     # exp_settings
     n_repeatitions = 5
     budget_generations = 200

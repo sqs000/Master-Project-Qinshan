@@ -84,7 +84,7 @@ if __name__ == "__main__":
             # evaluate the network with the parameters
             predicted_y = ea_network(data_x)
             # return the loss to be minimized
-            return criterion(data_y, predicted_y).item()
+            return criterion(predicted_y, data_y).item()
 
         # start training
         iterations = []

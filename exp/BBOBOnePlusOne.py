@@ -35,7 +35,7 @@ if __name__ == "__main__":
             predicted_y = ea_network(data_x)
             criterion = nn.MSELoss()
             # return the loss to be minimized
-            return criterion(data_y, predicted_y).item()
+            return criterion(predicted_y, data_y).item()
 
         # choose an optimizer
         num_parameters = sum(p.numel() for p in ea_network.parameters())

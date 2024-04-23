@@ -52,7 +52,7 @@ if __name__ == "__main__":
                     param.data.copy_(new_param_value.reshape(param.data.shape))
             predicted_y = opt_network(data_x)
             criterion = nn.MSELoss()
-            return criterion(data_y, predicted_y).item()
+            return criterion(predicted_y, data_y).item()
         final_ind, final_loss, epochs, epoch_losses = SGDOpt(opt_network, data_x, data_y, criterion, budget_generations, sgd_lr)
         final_pop_ga, final_loss_ga, generation_list, loss_list_ga = GA(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, obj_f=objective_function, crossover_flag=True, crossover_type="param")
         final_pop_ga_sharing, final_loss_ga_sharing, generation_list, loss_list_ga_sharing = GA_sharing(num_generations=budget_generations, population_size=1000, dim=num_parameters, p_m=0.04, niche_radius=5, obj_f=objective_function, crossover_flag=True, crossover_type="param")

@@ -8,6 +8,7 @@ import torch
 from data import data_generator
 from network import hidden2_FNN
 import matplotlib.pyplot as plt
+from utils import assign_param
 
 
 if __name__ == "__main__":
@@ -26,12 +27,6 @@ if __name__ == "__main__":
         ax.set_ylabel('X2')
         ax.set_zlabel('Y')
         ax.set_title(title)
-    # function to assign a network with specific parameters
-    def assign_param(network, parameters):
-        new_params = torch.split(torch.tensor(parameters), [p.numel() for p in network.parameters()])
-        with torch.no_grad():
-            for param, new_param_value in zip(network.parameters(), new_params):
-                param.data.copy_(new_param_value.reshape(param.data.shape))
 
     # read results from experiments
     # read network parameters

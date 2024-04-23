@@ -69,7 +69,7 @@ if __name__ == "__main__":
                     param.data.copy_(new_param_value.reshape(param.data.shape))
             predicted_y = opt_network(data_x)
             criterion = nn.MSELoss()
-            return criterion(data_y, predicted_y).item()
+            return criterion(predicted_y, data_y).item()
         population_size = args.populationsize
         budget_generations = math.ceil((args.numberofevaluations-(population_size*5000))/(population_size*5000))
         if budget_generations < 1:
