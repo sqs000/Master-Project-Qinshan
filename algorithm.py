@@ -257,3 +257,59 @@ def EvolveSGD(num_generations, population_size, dim, obj_f, network, data_x, dat
         loss_list.append(best_loss)
     # Final population contains optimized individuals
     return population, loss, generation_list, loss_list
+
+def EvolveSGD_sharing(num_generations, population_size, dim, niche_radius, obj_f, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
+    # Initialization
+    population = initialize_population(population_size, dim)
+    generation_list = []
+    loss_list = []
+    for generation in range(num_generations):
+        # Fitness Evaluation
+        fitness_scores = evaluate_fitness_sharing(population, niche_radius, obj_f)
+
+        # Selection
+        selected_parents = select_parents(population, fitness_scores)
+
+        # SGD
+        sgd_step(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
+        
+        # Crossover
+        offspring = crossover(selected_parents, type="param")
+
+        # Replace Old Population
+        population, loss = replace_population_sharing(population, offspring, population_size, niche_radius, obj_f)
+        best_loss = min(loss)
+
+        print(f"Generation {generation} loss: {best_loss}")
+        generation_list.append(generation)
+        loss_list.append(best_loss)
+    # Final population contains optimized individuals
+    return population, loss, generation_list, loss_list
+
+def EvolveSGD_dynamic(num_generations, population_size, dim, n_niches, niche_radius, obj_f, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
+    # Initialization
+    population = initialize_population(population_size, dim)
+    generation_list = []
+    loss_list = []
+    for generation in range(num_generations):
+        # Fitness Evaluation
+        fitness_scores = evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f)
+
+        # Selection
+        selected_parents = select_parents(population, fitness_scores)
+
+        # SGD
+        sgd_step(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
+        
+        # Crossover
+        offspring = crossover(selected_parents, type="param")
+
+        # Replace Old Population
+        population, loss = replace_population_dynamic(population, offspring, population_size, n_niches, niche_radius, obj_f)
+        best_loss = min(loss)
+
+        print(f"Generation {generation} loss: {best_loss}")
+        generation_list.append(generation)
+        loss_list.append(best_loss)
+    # Final population contains optimized individuals
+    return population, loss, generation_list, loss_list
