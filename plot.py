@@ -207,7 +207,7 @@
 #     main()
 
 
-# Plotting the GA-GA_sharing-GA_dynamic(param/node/layer/none) plots
+# Plotting the GA_SGD-GA_SGD_sharing-GA_SGD_dynamic plots
 import os
 import numpy as np
 import matplotlib.pyplot as plt
