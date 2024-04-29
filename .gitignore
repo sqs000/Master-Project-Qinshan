@@ -5,5 +5,6 @@ results
 results3
 results_F3
 results_crossover_ablation
+results_GA_SGD_FS
 files
 test.py
