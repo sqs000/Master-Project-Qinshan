@@ -305,9 +305,9 @@ def sgd_step(population, network, data_x, data_y, criterion, n_epochs, sgd_lr, b
     """ Conduct SGD to the individuals in the population. """
     dataset = TensorDataset(data_x, data_y)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    optimizer = optim.SGD(network.parameters(), lr=sgd_lr)
     for individual in population:
         assign_param(network, individual)
+        optimizer = optim.SGD(network.parameters(), lr=sgd_lr)
         for epoch in range(n_epochs):
             for batch_inputs, batch_targets in data_loader:
                 optimizer.zero_grad()
@@ -316,4 +316,4 @@ def sgd_step(population, network, data_x, data_y, criterion, n_epochs, sgd_lr, b
                 batch_loss.backward()
                 optimizer.step()
         final_params = [param.data.tolist() for param in network.parameters()]
-        individual = np.array(flatten_list(final_params))
+        individual[:] = np.array(flatten_list(final_params))
