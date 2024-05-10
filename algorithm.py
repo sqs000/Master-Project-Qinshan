@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader,TensorDataset
 import numpy as np
 from component import initialize_population, evaluate_fitness, evaluate_fitness_sharing, evaluate_fitness_dynamic,\
 evaluate_fitness_clustering, select_parents, crossover, mutate, replace_population, replace_population_sharing,\
-replace_population_dynamic, replace_population_clustering, sgd_step
+replace_population_dynamic, replace_population_clustering, replace_population_sharing_separate, replace_population_dynamic_separate, sgd_steps
 
 
 def AdamBatchOpt(network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
@@ -243,7 +243,7 @@ def EvolveSGD(num_generations, population_size, dim, obj_f, network, data_x, dat
         selected_parents = select_parents(population, fitness_scores)
 
         # SGD
-        sgd_step(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
+        sgd_steps(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
         
         # Crossover
         offspring = crossover(selected_parents, type="param")
@@ -271,13 +271,13 @@ def EvolveSGD_sharing(num_generations, population_size, dim, niche_radius, obj_f
         selected_parents = select_parents(population, fitness_scores)
 
         # SGD
-        sgd_step(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
+        sgd_steps(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
         
         # Crossover
         offspring = crossover(selected_parents, type="param")
 
         # Replace Old Population
-        population, loss = replace_population_sharing(population, offspring, population_size, niche_radius, obj_f)
+        population, loss = replace_population_sharing_separate(population, offspring, population_size, niche_radius, obj_f)
         best_loss = min(loss)
 
         print(f"Generation {generation} loss: {best_loss}")
@@ -299,13 +299,13 @@ def EvolveSGD_dynamic(num_generations, population_size, dim, n_niches, niche_rad
         selected_parents = select_parents(population, fitness_scores)
 
         # SGD
-        sgd_step(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
+        sgd_steps(selected_parents, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size)
         
         # Crossover
         offspring = crossover(selected_parents, type="param")
 
         # Replace Old Population
-        population, loss = replace_population_dynamic(population, offspring, population_size, n_niches, niche_radius, obj_f)
+        population, loss = replace_population_dynamic_separate(population, offspring, population_size, n_niches, niche_radius, obj_f)
         best_loss = min(loss)
 
         print(f"Generation {generation} loss: {best_loss}")

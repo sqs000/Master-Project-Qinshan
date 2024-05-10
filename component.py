@@ -15,14 +15,13 @@ def initialize_population(mu, dim):
     return population
 
 
-# GA Fitness function
+# Fitness functions
 def evaluate_fitness(population, obj_f):
     """ Evaluate fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
     fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
     return fitness_values
 
-# GA_sharing Fitness function
 def evaluate_fitness_sharing(population, niche_radius, obj_f):
     """ Evaluate sharing fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
@@ -30,7 +29,6 @@ def evaluate_fitness_sharing(population, niche_radius, obj_f):
     sharing_fitness_values = [fitness/niche_count(individual, population, niche_radius) for individual,fitness in zip(population,fitness_values)]
     return sharing_fitness_values
 
-# GA_dynamic Fitness function
 def evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f):
     """ Evaluate dynamic sharing fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
@@ -102,7 +100,6 @@ def sharing(distance, niche_radius, alpha_sh=1):
     else:
         return 0
     
-# GA_clustering fitness function
 def evaluate_fitness_clustering(population, n_clusters, alpha, obj_f):
     """ Evaluate clustering fitness of each individual in the population. """
     loss_values = [obj_f(individual) for individual in population]
@@ -129,7 +126,6 @@ def compute_d_max(population, labels, label, center):
     return max(distances)
 
 
-
 # Parent Selection
 def select_parents(population, fitness_scores):
     """ Select parents based on fitness scores. """
@@ -145,6 +141,7 @@ def select_parents(population, fitness_scores):
     return selected_parents
 
 def roulette_wheel_selection_with_scaling(population, fitness_values):
+    """ Select an individual from the population, where the probabilities are proportional to fitness scores. """
     min_fitness = min(fitness_values)
     scaled_fitness = [fit - min_fitness for fit in fitness_values]
     total_scaled_fitness = sum(scaled_fitness)
@@ -157,6 +154,7 @@ def roulette_wheel_selection_with_scaling(population, fitness_values):
     return selected_individual
 
 def roulette_wheel_spin(probabilities):
+    """ Select an index in the roulette wheel. """
     spin = random.uniform(0, 1)
     cumulative_probability = 0
     for i, prob in enumerate(probabilities):
@@ -190,6 +188,7 @@ def crossover(parents, type):
     return np.array(offspring)
 
 def uniform_crossover(parent1, parent2):
+    """ Perform uniform crossover on NN parameters of 2 parents. """
     assert len(parent1) == len(parent2), "Parents must have the same length"
     crossover_mask = [random.choice([True, False]) for _ in range(len(parent1))]
     child1 = [p1 if mask else p2 for p1, p2, mask in zip(parent1, parent2, crossover_mask)]
@@ -197,6 +196,7 @@ def uniform_crossover(parent1, parent2):
     return child1, child2
 
 def twopoint_layer_crossover(parent1, parent2):
+    """ Perform uniform crossover on NN layers of 2 parents. """
     assert len(parent1) == len(parent2), "Parents must have the same length"
     crossover_layer_masks = [random.choice([True, False]) for _ in range(3)]
     crossover_layer_n_params = [150, 1020, 21]
@@ -215,6 +215,7 @@ def twopoint_layer_crossover(parent1, parent2):
     return child1, child2
 
 def uniform_node_crossover(parent1, parent2):
+    """ Perform uniform crossover on NN nodes of 2 parents. """
     assert len(parent1) == len(parent2), "Parents must have the same length"
     parent1, parent2 = np.array(parent1), np.array(parent2)
     child1, child2 = np.zeros_like(parent1), np.zeros_like(parent2)
@@ -246,7 +247,7 @@ def mutate(offspring, mutation_rate):
 
 # Update Selection
 def replace_population(old_population, new_population, mu, obj_f):
-    """ Replace old population with new individuals. """
+    """ Replace old population with new individuals according to their fitness. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
     loss_values = [obj_f(x) for x in population]
@@ -258,9 +259,8 @@ def replace_population(old_population, new_population, mu, obj_f):
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
-# Fitness-Sharing Update Selection
 def replace_population_sharing(old_population, new_population, mu, niche_radius, obj_f):
-    """ Replace old population with new individuals. """
+    """ Replace old population with new individuals according to their sharing fitness. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
     fitness_values = evaluate_fitness_sharing(population, niche_radius, obj_f)
@@ -272,9 +272,24 @@ def replace_population_sharing(old_population, new_population, mu, niche_radius,
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
-# Dynamic-Fitness-Sharing Update Selection
+def replace_population_sharing_separate(old_population, new_population, mu, niche_radius, obj_f):
+    """ Replace old population with new individuals according to their sharing fitness, \\
+        where the sharing fitnesses of old population and new population are calculated separately. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # evaluation and sort
+    old_fitness_values = evaluate_fitness_sharing(old_population, niche_radius, obj_f)
+    new_fitness_values = evaluate_fitness_sharing(new_population, niche_radius, obj_f)
+    fitness_values = old_fitness_values + new_fitness_values
+    sorted_indices = np.argsort(fitness_values)[::-1]
+    sorted_population = [population[i] for i in sorted_indices]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
+    # select
+    selected_population = sorted_population[:mu]
+    selected_loss = sorted_loss[:mu]
+    return np.array(selected_population), selected_loss
+
 def replace_population_dynamic(old_population, new_population, mu, n_niches, niche_radius, obj_f):
-    """ Replace old population with new individuals. """
+    """ Replace old population with new individuals according to their dynamic sharing fitness. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
     fitness_values = evaluate_fitness_dynamic(population, n_niches, niche_radius, obj_f)
@@ -286,9 +301,24 @@ def replace_population_dynamic(old_population, new_population, mu, n_niches, nic
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
-# Clustering-Fitness Update Selection
+def replace_population_dynamic_separate(old_population, new_population, mu, n_niches, niche_radius, obj_f):
+    """ Replace old population with new individuals according to their dynamic sharing fitness, \\
+        where the dynamic sharing fitnesses of old population and new population are calculated separately. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # evaluation and sort
+    old_fitness_values = evaluate_fitness_dynamic(old_population, n_niches, niche_radius, obj_f)
+    new_fitness_values = evaluate_fitness_dynamic(new_population, n_niches, niche_radius, obj_f)
+    fitness_values = old_fitness_values + new_fitness_values
+    sorted_indices = np.argsort(fitness_values)[::-1]
+    sorted_population = [population[i] for i in sorted_indices]
+    sorted_loss = [obj_f(ind) for ind in sorted_population]
+    # select
+    selected_population = sorted_population[:mu]
+    selected_loss = sorted_loss[:mu]
+    return np.array(selected_population), selected_loss
+
 def replace_population_clustering(old_population, new_population, mu, n_clusters, alpha, obj_f):
-    """ Replace old population with new individuals. """
+    """ Replace old population with new individuals according to their clustering fitness. """
     population = np.concatenate((old_population, new_population), axis=0)
     # evaluation and sort
     fitness_values = evaluate_fitness_clustering(population, n_clusters, alpha, obj_f)
@@ -301,8 +331,8 @@ def replace_population_clustering(old_population, new_population, mu, n_clusters
     return np.array(selected_population), selected_loss
 
 
-def sgd_step(population, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
-    """ Conduct SGD to the individuals in the population. """
+def sgd_steps(population, network, data_x, data_y, criterion, n_epochs, sgd_lr, batch_size):
+    """ Conduct SGD steps to the individuals in the population. """
     dataset = TensorDataset(data_x, data_y)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     for individual in population:

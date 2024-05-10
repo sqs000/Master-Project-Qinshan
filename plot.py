@@ -207,7 +207,74 @@
 #     main()
 
 
-# Plotting the GA_SGD-GA_SGD_sharing-GA_SGD_dynamic plots
+# Plotting the GA_SGD-SGD-Adam plots
+# import os
+# import numpy as np
+# import matplotlib.pyplot as plt
+
+# # Function to load loss data from npy files
+# def load_losses(folder_path, max_iterations=None):
+#     if max_iterations:
+#         losses = []
+#         for root, _, files in os.walk(folder_path):
+#             for file in files:
+#                 if "losses" in file:
+#                     loss_file = os.path.join(root, file)
+#                     loss_data = np.load(loss_file)
+#                     period = len(loss_data) // max_iterations
+#                     loss_data = loss_data[period-1::period]
+#                     losses.append(loss_data)
+#         return np.array(losses)
+#     else:
+#         losses = []
+#         for root, _, files in os.walk(folder_path):
+#             for file in files:
+#                 if "losses" in file:
+#                     loss_file = os.path.join(root, file)
+#                     loss_data = np.load(loss_file)
+#                     losses.append(loss_data)
+#         return np.array(losses)
+
+# # Function to plot average loss curves
+# def plot_loss_curves(losses, title, labels):
+#     for i, loss in enumerate(losses):
+#         mean_loss = np.mean(loss, axis=0)
+#         std_loss = np.std(loss, axis=0)
+#         plt.plot(mean_loss, label=labels[i])
+#         plt.fill_between(np.arange(len(mean_loss)), mean_loss - std_loss, mean_loss + std_loss, alpha=0.2)
+#     plt.title(title)
+#     plt.yscale('log')
+#     plt.xlabel('Number of evaluations (×5000000)')
+#     plt.ylabel('MSE Loss (log scale)')
+#     plt.legend()
+#     plt.show()
+
+# # Main function to traverse directories and plot loss curves
+# def main():
+#     functions = ['F1', 'F3', 'F7', 'F13', 'F16', 'F22']
+#     algorithms = ['GA_SGD', 'SGD', 'Adam']
+    
+#     max_iterations = 100  # to compare SGD/Adam with GA_SGD, sample 100 SGD/Adam losses
+#     for func in functions:
+#         func_path = os.path.join('results_GA_SGD', func)
+#         func_losses = []
+#         labels = []
+#         for alg in algorithms:
+#             alg_path = os.path.join(func_path, alg)
+#             if alg == "GA_SGD":
+#                 func_losses.append(load_losses(alg_path))
+#             else:
+#                 func_losses.append(load_losses(alg_path, max_iterations))
+#             labels.append(f'{alg}')
+#         plt.tight_layout()
+#         plot_loss_curves(func_losses, func, labels)
+#         if func == 'F3':
+#             print(func_losses[labels.index("SGD")])
+
+# if __name__ == "__main__":
+#     main()
+
+# Plotting the GA_SGD-SGD-Adam plots
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -222,7 +289,7 @@ def load_losses(folder_path, max_iterations=None):
                     loss_file = os.path.join(root, file)
                     loss_data = np.load(loss_file)
                     period = len(loss_data) // max_iterations
-                    loss_data = loss_data[::period][1:]
+                    loss_data = loss_data[period-1::period]
                     losses.append(loss_data)
         return np.array(losses)
     else:
@@ -251,16 +318,20 @@ def plot_loss_curves(losses, title, labels):
 
 # Main function to traverse directories and plot loss curves
 def main():
-    functions = ['F1', 'F3', 'F7', 'F13', 'F16', 'F22']
-    algorithms = ['GA_SGD', 'GA_SGD_sharing', 'GA_SGD_dynamic']
-        
+    functions = ['F3']
+    algorithms = ['GA_SGD', 'R=5', 'R=10', 'R=20']
+    
+    max_iterations = 100  # to compare SGD/Adam with GA_SGD, sample 100 SGD/Adam losses
     for func in functions:
-        func_path = os.path.join('results_GA_SGD_FS', func)
+        func_path = os.path.join('results_GA_SGD_sharing', func)
         func_losses = []
         labels = []
         for alg in algorithms:
             alg_path = os.path.join(func_path, alg)
-            func_losses.append(load_losses(alg_path))
+            if 'R' or 'GA' in alg:
+                func_losses.append(load_losses(alg_path))
+            else:
+                func_losses.append(load_losses(alg_path, max_iterations))
             labels.append(f'{alg}')
         plt.tight_layout()
         plot_loss_curves(func_losses, func, labels)

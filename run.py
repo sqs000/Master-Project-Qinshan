@@ -72,11 +72,11 @@ if __name__ == "__main__":
             criterion = nn.MSELoss()
             return criterion(predicted_y, data_y).item()
         population_size = args.populationsize
-        budget_generations = math.ceil((args.numberofevaluations-(population_size*5000))/(population_size*5000))
-        if budget_generations < 1:
-            budget_generations = 1
         num_parameters = sum(p.numel() for p in opt_network.parameters())
         if "GA_SGD" not in args.algorithm:
+            budget_generations = math.ceil((args.numberofevaluations-(population_size*5000))/(population_size*5000))
+            if budget_generations < 1:
+                budget_generations = 1
             p_m = args.mutationrate
             crossover_type = args.crossovertype
             crossover_flag = True if crossover_type in ["layer", "node", "param"] else False
@@ -102,6 +102,7 @@ if __name__ == "__main__":
             n_epochs = args.numberofepochs
             lr = args.learningrate
             batch_size = args.batchsize
+            budget_generations = math.ceil( (args.numberofevaluations-(population_size*5000)) / (population_size*5000 + population_size*n_epochs*10000) )
             final_pop_ga_sgd, final_loss_ga_sgd, generation_list, loss_list_ga_sgd = EvolveSGD(budget_generations, population_size, num_parameters, objective_function, opt_network, data_x, data_y, nn.MSELoss(), n_epochs, lr, batch_size)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-pop_i-'+str(INSTANCE), final_pop_ga_sgd)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga_sgd))
@@ -111,6 +112,7 @@ if __name__ == "__main__":
             lr = args.learningrate
             batch_size = args.batchsize
             niche_radius = args.nicheradius
+            budget_generations = math.ceil( (args.numberofevaluations-(population_size*5000)) / (population_size*5000 + population_size*n_epochs*10000) )
             final_pop_ga_sgd_sharing, final_loss_ga_sgd_sharing, generation_list, loss_list_ga_sgd_sharing = EvolveSGD_sharing(budget_generations, population_size, num_parameters, niche_radius, objective_function, opt_network, data_x, data_y, nn.MSELoss(), n_epochs, lr, batch_size)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_R'+str(args.nicheradius)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-pop_i-'+str(INSTANCE), final_pop_ga_sgd_sharing)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_R'+str(args.nicheradius)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga_sgd_sharing))
@@ -121,6 +123,7 @@ if __name__ == "__main__":
             batch_size = args.batchsize
             n_niches = args.numberofniches
             niche_radius = args.nicheradius
+            budget_generations = math.ceil( (args.numberofevaluations-(population_size*5000)) / (population_size*5000 + population_size*n_epochs*10000) )
             final_pop_ga_sgd_dynamic, final_loss_ga_sgd_dynamic, generation_list, loss_list_ga_sgd_dynamic = EvolveSGD_dynamic(budget_generations, population_size, num_parameters, n_niches, niche_radius, objective_function, opt_network, data_x, data_y, nn.MSELoss(), n_epochs, lr, batch_size)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_R'+str(args.nicheradius)+'_N'+str(args.numberofniches)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-pop_i-'+str(INSTANCE), final_pop_ga_sgd_dynamic)
             np.save('./results3/BBOB-'+str(args.function)+'_'+args.algorithm+'_E'+str(args.numberofevaluations)+'_P'+str(args.populationsize)+'_R'+str(args.nicheradius)+'_N'+str(args.numberofniches)+'_ne'+str(args.numberofepochs)+'_lr'+str(args.learningrate)+'_bs'+str(args.batchsize)+'_f-loss_i-'+str(INSTANCE), np.array(final_loss_ga_sgd_dynamic))
