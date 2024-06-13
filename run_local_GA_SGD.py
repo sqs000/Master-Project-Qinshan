@@ -5,10 +5,10 @@ import sys
 repetitions = 5
 
 # Specify the BBOB function numbers in a list
-functions = [3]
+functions = [1, 3, 7, 13, 16, 22]
 
-# Specify the algorithm and hyperparameters
-algorithms = ["GA_SGD_dynamic"]
+# Specify the algorithms
+algorithms = ["GA_SGD", "GA_SGD_sharing"]
 
 # Repeat the run for the specified number of repetitions
 for rep in range(1, repetitions + 1):

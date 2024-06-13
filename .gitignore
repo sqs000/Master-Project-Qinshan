@@ -1,11 +1,6 @@
 __pycache__
 coco-master
 .vscode
-results
-results3
-results_F3
-results_crossover_ablation
-results_GA_SGD
-results_GA_SGD_sharing
+results*
 files
-test.py
+try.py

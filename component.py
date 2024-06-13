@@ -317,6 +317,29 @@ def replace_population_dynamic_separate(old_population, new_population, mu, n_ni
     selected_loss = sorted_loss[:mu]
     return np.array(selected_population), selected_loss
 
+def replace_population_dynamic_elitism(old_population, new_population, mu, n_niches, niche_radius, obj_f):
+    """ Replace old population with new individuals according to their dynamic sharing fitness, \\
+        where the dynamic sharing fitnesses of old population and new population are calculated altogether, \\
+        while keeping the dynamic peak set (dps) surviving as elitism. """
+    population = np.concatenate((old_population, new_population), axis=0)
+    # extract dynamic peak set and keep them 
+    dps = DPI(population, n_niches, niche_radius, obj_f)
+    niche_sizes = size_niches(population, dps, niche_radius)
+    dps_loss = [obj_f(ind) for ind in dps]
+    # evaluate and sort individuals that are not in dps
+    indices_not_dps = np.setdiff1d(np.arange(len(population)), np.where(np.isin(population, np.array(dps)))[0])
+    population_not_dps = population[indices_not_dps]
+    loss_values = [obj_f(ind) for ind in population_not_dps]
+    fitness_values = [1 / loss if loss != 0 else float('inf') for loss in loss_values]
+    dynamic_sharing_fitness_values = [fitness/dynamic_niche_count(ind, population, niche_radius, dps, niche_sizes) for ind,fitness in zip(population_not_dps,fitness_values)]
+    sorted_indices = np.argsort(dynamic_sharing_fitness_values)[::-1]
+    sorted_population_not_dps = [population_not_dps[i] for i in sorted_indices]
+    sorted_loss = [loss_values[i] for i in sorted_indices]
+    # select
+    selected_population = dps + sorted_population_not_dps[:mu-len(dps)]
+    selected_loss = dps_loss + sorted_loss[:mu-len(dps)]
+    return np.array(selected_population), selected_loss
+
 def replace_population_clustering(old_population, new_population, mu, n_clusters, alpha, obj_f):
     """ Replace old population with new individuals according to their clustering fitness. """
     population = np.concatenate((old_population, new_population), axis=0)
