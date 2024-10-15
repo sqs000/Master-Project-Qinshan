@@ -4,3 +4,6 @@ coco-master
 results*
 files
 try.py
+newEval_SGD.py
+newTest.py
+run_local*
