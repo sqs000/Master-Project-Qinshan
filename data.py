@@ -14,7 +14,7 @@ class data_generator:
         self.problem = self.suite.get_problem_by_function_dimension_instance(function=function, dimension=dimension, instance=instance)
         self.device = device
 
-    def generate(self, data_size, x_min=-5, x_max=5):
+    def generate(self, data_size, x_min=-5, x_max=5, standardize=True):
         x = []
         y = []
         for i in range(data_size):
@@ -22,11 +22,15 @@ class data_generator:
             output = self.problem(input)
             x.append(input)
             y.append([output])
-        # standardize the data
-        scaler = StandardScaler()
-        x_tensor = torch.tensor(scaler.fit_transform(x, y), dtype=torch.float32, device=self.device)        
-        y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=self.device)
-        return x_tensor, y_tensor
+        if standardize:
+            scaler = StandardScaler()
+            x_tensor = torch.tensor(scaler.fit_transform(x, y), dtype=torch.float32, device=self.device)        
+            y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=self.device)
+            return x_tensor, y_tensor
+        else:
+            x_tensor = torch.tensor(np.array(x), dtype=torch.float32, device=self.device)        
+            y_tensor = torch.tensor(np.array(y), dtype=torch.float32, device=self.device)
+            return x_tensor, y_tensor
 
 
 class ForestDataset(Dataset):

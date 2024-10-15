@@ -5,22 +5,6 @@ from data import data_generator
 import numpy as np
 import random
 
-def test(F_obj, pop1, pop2, pop3, pop4, pop5, SGD:bool):
-    if SGD:
-        population = np.concatenate((ind1, ind2, ind3, ind4, ind5), axis=0).reshape((5, -1))
-    else:
-        population = np.concatenate((pop1, pop2, pop3, pop4, pop5), axis=0)
-    loss_values = [F_obj(x) for x in population]
-    min_loss = min(loss_values)
-    max_loss = max(loss_values)
-    mean_loss = np.mean(loss_values)
-    std_deviation = np.std(loss_values, ddof=1)
-    std_error = np.std(loss_values, ddof=1)/np.sqrt(len(loss_values))
-    oneq_loss = np.percentile(loss_values, 25)
-    twoq_loss = np.percentile(loss_values, 50)
-    threeq_loss = np.percentile(loss_values, 75)
-    return [min_loss, max_loss, mean_loss, std_deviation, std_error, oneq_loss, twoq_loss, threeq_loss]
-
 
 if __name__ == "__main__":
 
@@ -57,17 +41,17 @@ if __name__ == "__main__":
     # pop4 = np.load("results_GA_SGD_sharing\F7\R=20\BBOB-7_GA_SGD_sharing_E500000000_P200_R20.0_ne2_lr1e-05_bs64_f-pop_i-4.npy")
     # pop5 = np.load("results_GA_SGD_sharing\F7\R=20\BBOB-7_GA_SGD_sharing_E500000000_P200_R20.0_ne2_lr1e-05_bs64_f-pop_i-5.npy")
     # F13: R=5 √ √
-    # pop1 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-1.npy")
-    # pop2 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-2.npy")
-    # pop3 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-3.npy")
-    # pop4 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-4.npy")
-    # pop5 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-5.npy")
+    pop1 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-1.npy")
+    pop2 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-2.npy")
+    pop3 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-3.npy")
+    pop4 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-4.npy")
+    pop5 = np.load("results_GA_SGD_sharing\F13\R=5\BBOB-13_GA_SGD_sharing_E500000000_P200_R5.0_ne2_lr1e-05_bs64_f-pop_i-5.npy")
     # F13: GA-SGD
-    pop1 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-1.npy")
-    pop2 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-2.npy")
-    pop3 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-3.npy")
-    pop4 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-4.npy")
-    pop5 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-5.npy")
+    # pop1 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-1.npy")
+    # pop2 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-2.npy")
+    # pop3 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-3.npy")
+    # pop4 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-4.npy")
+    # pop5 = np.load("results_GA_SGD_sharing\F13\GA_SGD\BBOB-13_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-5.npy")
     # F16: GA-SGD ×
     # pop1 = np.load("results_GA_SGD_sharing\F16\GA_SGD\BBOB-16_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-1.npy")
     # pop2 = np.load("results_GA_SGD_sharing\F16\GA_SGD\BBOB-16_GA_SGD_E500000000_P200_ne2_lr1e-05_bs64_f-pop_i-2.npy")
@@ -109,11 +93,11 @@ if __name__ == "__main__":
     # ind4 = np.load("results_GA_SGD_sharing\F7\SGD\BBOB-7_SGD_E500000000_lr1e-05_bs64_f-ind_i-4.npy")
     # ind5 = np.load("results_GA_SGD_sharing\F7\SGD\BBOB-7_SGD_E500000000_lr1e-05_bs64_f-ind_i-5.npy")
     # F13
-    ind1 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-1.npy")
-    ind2 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-2.npy")
-    ind3 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-3.npy")
-    ind4 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-4.npy")
-    ind5 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-5.npy")
+    # ind1 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-1.npy")
+    # ind2 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-2.npy")
+    # ind3 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-3.npy")
+    # ind4 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-4.npy")
+    # ind5 = np.load("results_GA_SGD_sharing\F13\SGD\BBOB-13_SGD_E500000000_lr1e-05_bs64_f-ind_i-5.npy")
     # F16
     # ind1 = np.load("results_GA_SGD_sharing\F16\SGD\BBOB-16_SGD_E500000000_lr1e-05_bs64_f-ind_i-1.npy")
     # ind2 = np.load("results_GA_SGD_sharing\F16\SGD\BBOB-16_SGD_E500000000_lr1e-05_bs64_f-ind_i-2.npy")
@@ -141,11 +125,11 @@ if __name__ == "__main__":
     # ind4 = np.load("results_SGD_newEval\F7\BBOB-7_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-4.npy")
     # ind5 = np.load("results_SGD_newEval\F7\BBOB-7_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-5.npy")
     # F13
-    # ind1 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-1.npy")
-    # ind2 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-2.npy")
-    # ind3 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-3.npy")
-    # ind4 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-4.npy")
-    # ind5 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-5.npy")
+    ind1 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-1.npy")
+    ind2 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-2.npy")
+    ind3 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-3.npy")
+    ind4 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-4.npy")
+    ind5 = np.load("results_SGD_newEval\F13\BBOB-13_SGD_newEval_50000-59689-epochs_lr1e-05_bs64_f-ind_i-5.npy")
 
     GA_SGD_losses = []
     SGD_losses = []
@@ -172,10 +156,12 @@ if __name__ == "__main__":
             criterion = nn.MSELoss()
             return criterion(predicted_y, data_y).item()
         
-        GA_SGD_pop_test_loss_statistics = test(objective_function, pop1, pop2, pop3, pop4, pop5, False)
-        SGD_pop_test_loss_statistics = test(objective_function, ind1, ind2, ind3, ind4, ind5, True)
-        GA_SGD_losses.append(GA_SGD_pop_test_loss_statistics[0])
-        SGD_losses.append(SGD_pop_test_loss_statistics[0])
+        GA_SGD_population = np.concatenate((pop1[0], pop2[0], pop3[0], pop4[0], pop5[0]), axis=0).reshape((5, -1))
+        SGD_population = np.concatenate((ind1, ind2, ind3, ind4, ind5), axis=0).reshape((5, -1))
+        GA_SGD_losses = [objective_function(x) for x in GA_SGD_population]
+        SGD_losses = [objective_function(x) for x in SGD_population]
+        GA_SGD_losses.append(np.mean(GA_SGD_losses))
+        SGD_losses.append(np.mean(SGD_losses))
 
     print(f"GA_SGD_mean_loss: {np.mean(GA_SGD_losses)}.")
     print(f"SGD_mean_loss: {np.mean(SGD_losses)}.")

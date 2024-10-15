@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # build network
     opt_network = hidden2_FNN(2, 50, 20, 1)
-    opt_network.to(torch.device("cuda"))
+    opt_network.to(torch.device("cpu"))
 
     # define objective function to rank individuals
     def objective_function(parameters):

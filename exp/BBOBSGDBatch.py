@@ -15,7 +15,7 @@ import numpy as np
 if __name__ == "__main__":
     # data generation
     generator = data_generator(suite_name="bbob", function=1, dimension=2, instance=1, device=torch.device("cuda"))
-    data_x, data_y = generator.generate(data_size=5000)
+    data_x, data_y = generator.generate(data_size=5000, standardize=False)
 
     # training settings
     n_repeatitions = 10

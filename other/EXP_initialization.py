@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # generate data
     f_1_d_3_generator = data_generator(suite_name=suite_name, function=function, dimension=dimension, instance=instance)
-    x, y = f_1_d_3_generator.generate(data_size=data_size)
+    x, y = f_1_d_3_generator.generate(data_size=data_size, standardize=False)
     dataset = TensorDataset(x, y)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 

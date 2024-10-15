@@ -13,7 +13,7 @@ from algorithm import GA
 if __name__ == "__main__":
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
+    data_x, data_y = f_3_d_2_generator.generate(data_size=5000, standardize=False)
     opt_network = hidden2_FNN(2, 50, 20, 1)
     opt_network.to(torch.device("cpu"))
     def objective_function(parameters):

@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
+    data_x, data_y = f_3_d_2_generator.generate(data_size=5000, standardize=False)
 
     n_repetitions = 20
     best_losses = []

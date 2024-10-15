@@ -15,7 +15,7 @@ from algorithm import GA_clustering
 if __name__ == "__main__":
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
+    data_x, data_y = f_3_d_2_generator.generate(data_size=5000, standardize=False)
     # calculate num_parameters
     opt_network = hidden2_FNN(2, 50, 20, 1)
     num_parameters = sum(p.numel() for p in opt_network.parameters())

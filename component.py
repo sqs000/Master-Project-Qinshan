@@ -149,18 +149,20 @@ def roulette_wheel_selection_with_scaling(population, fitness_values):
         selection_probabilities = [1 / len(scaled_fitness)] * len(scaled_fitness)
     else:
         selection_probabilities = [fit / total_scaled_fitness for fit in scaled_fitness]
+    # print("Selection Probabilities:", selection_probabilities)  # Debug print
     selected_index = roulette_wheel_spin(selection_probabilities)
     selected_individual = population[selected_index]
     return selected_individual
 
 def roulette_wheel_spin(probabilities):
     """ Select an index in the roulette wheel. """
-    spin = random.uniform(0, 1)
+    spin = random.uniform(0, sum(probabilities))
     cumulative_probability = 0
     for i, prob in enumerate(probabilities):
         cumulative_probability += prob
         if spin <= cumulative_probability:
             return i
+    return 0
 
 
 # Crossover

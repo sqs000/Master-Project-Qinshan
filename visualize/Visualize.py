@@ -35,10 +35,10 @@ if __name__ == "__main__":
 	X_train = scaler_x.transform(X_train)
 
 	# 3. train model
-	model.fit(X_train, y_train, batch_size=32, epochs=200, verbose=1)
+	model.fit(X_train, y_train, batch_size=64, epochs=1000, verbose=1)
 
 	# 4. build mesh and plot
-	landscapeviz.build_mesh(model, (X_train, y_train), grid_length=100, verbose=1)
+	landscapeviz.build_mesh(model, (X_train, y_train), grid_length=200, verbose=1)
 	landscapeviz.plot_contour(key="mean_squared_error")
 	landscapeviz.plot_3d(key="mean_squared_error")
 	

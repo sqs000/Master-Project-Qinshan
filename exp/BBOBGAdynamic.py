@@ -20,7 +20,7 @@ if __name__ == "__main__":
     for function in range(1, 25, 1):
         # generate function data
         generator = data_generator(suite_name="bbob", function=function, dimension=2, instance=1, device=torch.device("cpu"))
-        data_x, data_y = generator.generate(data_size=5000)
+        data_x, data_y = generator.generate(data_size=5000, standardize=False)
         # result collection
         ga_dynamic_losses = np.zeros((n_repetitions, budget_generations))
         # start running

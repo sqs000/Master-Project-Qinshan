@@ -5,10 +5,11 @@ import sys
 repetitions = 5
 
 # Specify the BBOB function numbers in a list
-functions = [1, 3, 7, 13, 16, 22]
+# functions = [1, 3, 7, 13, 16, 22]
+functions = [3]
 
 # Specify the algorithms
-algorithms = ["GA_SGD", "GA_SGD_sharing"]
+algorithms = ["GA_SGD_sharing"]
 
 # Repeat the run for the specified number of repetitions
 for rep in range(1, repetitions + 1):
@@ -29,7 +30,8 @@ for rep in range(1, repetitions + 1):
                     "-i", str(rep)
                 ])
             elif algo == "GA_SGD_sharing":
-                for r in [1, 5, 10, 20, 50]:
+                # for r in [1, 5, 10, 20, 50]:
+                for r in [5]:
                     subprocess.run([
                         sys.executable, "run.py",
                         "--function", str(f),

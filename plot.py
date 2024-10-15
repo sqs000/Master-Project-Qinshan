@@ -32,18 +32,24 @@ def load_losses(folder_path, max_iterations=None):
         return np.array(losses)
 
 # Function to plot average loss curves
-def plot_loss_curves(losses, title, labels):
+def plot_loss_curves(losses, title, labels, x_range=None):
+    # tab10 or tab20 colormap for plotting
     plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.tab10.colors))
     for i, loss in enumerate(losses):
         mean_loss = np.mean(loss, axis=0)
         std_loss = np.std(loss, axis=0)
-        plt.plot(mean_loss, label=labels[i])
-        plt.fill_between(np.arange(len(mean_loss)), mean_loss - std_loss, mean_loss + std_loss, alpha=0.2)
+        if x_range:
+            plt.plot(x_range, mean_loss, label=labels[i])
+            plt.fill_between(x_range, mean_loss - std_loss, mean_loss + std_loss, alpha=0.2)
+        else:
+            plt.plot(mean_loss, label=labels[i])
+            plt.fill_between(np.arange(len(mean_loss)), mean_loss - std_loss, mean_loss + std_loss, alpha=0.2)
     plt.title(title)
     plt.yscale('log')
-    plt.xlabel('Number of evaluations (×5000000)')
-    plt.ylabel('MSE Loss (log scale)')
-    plt.legend()
+    plt.xlabel('Number of evaluations (×5000000)', fontsize=14)
+    plt.ylabel('MSE Loss (log scale)', fontsize=14)
+    plt.legend(fontsize=14)
+    plt.grid(True)
     plt.show()
 
 
@@ -72,7 +78,7 @@ def SGD_Adam_GA_GA_sharing_GA_dynamic_Fs():
                     labels.append(f'{alg} ({setting})')
             func_losses.extend(alg_losses)
         plt.tight_layout()
-        plot_loss_curves(func_losses, func, labels)
+        plot_loss_curves(func_losses, func, labels, x_range=range(2, 101))
 
 # Plotting the SGD-Adam-GA-GA_sharing-GA_dynamic(param/node/layer) plots for F3
 def SGD_Adam_GA_GA_sharing_GA_dynamic_F3():
@@ -95,7 +101,7 @@ def SGD_Adam_GA_GA_sharing_GA_dynamic_F3():
                 labels.append(f'{alg} ({setting})')
         func_losses.extend(alg_losses)
     plt.tight_layout()
-    plot_loss_curves(func_losses, "F3", labels)
+    plot_loss_curves(func_losses, "F3", labels, x_range=range(2, 401))
 
 # Plotting the GA-GA_sharing-GA_dynamic(param/node/layer/none) plots
 def GA_GA_sharing_GA_dynamic_no_crossover():
@@ -116,7 +122,7 @@ def GA_GA_sharing_GA_dynamic_no_crossover():
                 labels.append(f'{alg} ({setting})')
             func_losses.extend(alg_losses)
         plt.tight_layout()
-        plot_loss_curves(func_losses, func, labels)
+        plot_loss_curves(func_losses, func, labels, x_range=range(2, 101))
 
 # Plotting the GA_SGD-SGD-Adam plots
 def GA_SGD_SGD_Adam():
@@ -136,13 +142,11 @@ def GA_SGD_SGD_Adam():
                 func_losses.append(load_losses(alg_path, max_iterations))
             labels.append(f'{alg}')
         plt.tight_layout()
-        plot_loss_curves(func_losses, func, labels)
-        if func == 'F3':
-            print(func_losses[labels.index("SGD")])
+        plot_loss_curves(func_losses, func, labels, x_range=range(1, 101))
 
 # Plotting the GA_SGD-SGD-Adam plots
 def GA_SGD_sharing_SGD():
-    functions = ['F22']
+    functions = ['F1', 'F3', 'F7', 'F13', 'F16', 'F22']
     algorithms = ['GA_SGD', 'SGD', 'R=1', 'R=5', 'R=10', 'R=20', 'R=50']
     
     max_iterations = 100  # to compare SGD/Adam with GA_SGD, sample 100 SGD/Adam losses
@@ -158,12 +162,12 @@ def GA_SGD_sharing_SGD():
                 func_losses.append(load_losses(alg_path))
             labels.append(f'{alg}')
         plt.tight_layout()
-        plot_loss_curves(func_losses, func, labels)
+        plot_loss_curves(func_losses, func, labels, x_range=range(1, 101))
 
 # Plotting the GA_SGD-SGD-Adam plots
 def GA_SGD_dynamic_SGD():
     functions = ['F3']
-    algorithms = ['GA_SGD', 'SGD', 'R=5', 'R=5 N=20']
+    algorithms = ['GA_SGD', 'SGD', 'R=5', 'R=5 N=5', 'R=5 N=10', 'R=5 N=20', 'R=5 N=50', 'R=5 N=100']
     
     max_iterations = 100  # to compare SGD/Adam with GA_SGD, sample 100 SGD/Adam losses
     for func in functions:
@@ -178,7 +182,7 @@ def GA_SGD_dynamic_SGD():
                 func_losses.append(load_losses(alg_path))
             labels.append(f'{alg}')
         plt.tight_layout()
-        plot_loss_curves(func_losses, func, labels)
+        plot_loss_curves(func_losses, func, labels, x_range=range(1, 101))
 
 
 if __name__ == "__main__":
@@ -186,5 +190,5 @@ if __name__ == "__main__":
     # SGD_Adam_GA_GA_sharing_GA_dynamic_F3()
     # GA_GA_sharing_GA_dynamic_no_crossover()
     # GA_SGD_SGD_Adam()
-    GA_SGD_sharing_SGD()
-    # GA_SGD_dynamic_SGD()
+    # GA_SGD_sharing_SGD()
+    GA_SGD_dynamic_SGD()

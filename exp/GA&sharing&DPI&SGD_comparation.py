@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1)
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
+    data_x, data_y = f_3_d_2_generator.generate(data_size=5000, standardize=False)
     torch.save(data_x, "results/GA/data_x.pt")
     torch.save(data_y, "results/GA/data_y.pt")
     # experiment settings

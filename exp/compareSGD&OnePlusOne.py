@@ -16,7 +16,7 @@ import numpy as np
 if __name__ == "__main__":
     # data generation
     f_3_d_2_generator = data_generator(suite_name="bbob", function=3, dimension=2, instance=1, device=torch.device("cpu"))
-    data_x, data_y = f_3_d_2_generator.generate(data_size=5000)
+    data_x, data_y = f_3_d_2_generator.generate(data_size=5000, standardize=False)
 
 
     # build the input mesh grid for plotting
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     plot_3d_surface(ax1_sgd, 'Initial Function (SGD)', x1_mesh, x2_mesh, sgd_initial_y)
 
     # training settings
-    num_epochs = 1000
-    sgd_learning_rate = 0.00005
+    num_epochs = 5000
+    sgd_learning_rate = 0.0001
     criterion = nn.MSELoss()
     sgd_optimizer = optim.SGD(sgd_network.parameters(), lr=sgd_learning_rate)
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     # choose an optimizer
     num_parameters = sum(p.numel() for p in ea_network.parameters())
-    ea_optimizer = optimizerlib.OnePlusOne(parametrization=num_parameters, budget=1000)
+    ea_optimizer = optimizerlib.OnePlusOne(parametrization=num_parameters, budget=5000)
 
     # start training
     iterations = []
